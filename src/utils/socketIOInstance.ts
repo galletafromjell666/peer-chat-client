@@ -4,6 +4,7 @@ import { EventEmitter } from "events";
 interface SocketIOClientConfig {
   // token: string;
   url: string;
+  query: any;
 }
 
 export default class SocketIoClient extends EventEmitter {
@@ -13,7 +14,9 @@ export default class SocketIoClient extends EventEmitter {
   constructor(config: SocketIOClientConfig) {
     super();
     this.config = config;
-    this._connect();
+    if (this.config.query) {
+      this._connect();
+    }
   }
 
   get IsConnected() {
@@ -24,15 +27,15 @@ export default class SocketIoClient extends EventEmitter {
     const connectOptions = {
       autoConnect: true,
       forceNew: false,
-      // TODO: Add room here.
-      reconnection: true,
+      reconnection: false,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 3000,
-      withCredentials: true,
+      withCredentials: false,
       transports: ["websocket"],
+      ...this.config,
     };
 
-    this.socket = io(this.config.url, connectOptions);
+    this.socket = io("https://localhost:3600/", connectOptions);
 
     this.socket.on("connect", () => {
       this.emit("connect", this.socket);
@@ -42,6 +45,11 @@ export default class SocketIoClient extends EventEmitter {
       console.warn("socketIO disconnected ", reason);
       this.emit("disconnect", reason);
     });
+  }
+
+  public disconnect() {
+    console.warn("Disconnected method called on socketIO client!");
+    this.socket.disconnect();
   }
 
   public subscribe(event: string, callback: (data: unknown) => void) {
