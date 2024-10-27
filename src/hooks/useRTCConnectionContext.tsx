@@ -1,7 +1,7 @@
-import { createContext, createRef, useContext } from "react";
+import { createContext, createRef, MutableRefObject, useContext } from "react";
 
 const RTCPeerConnectionContext = createContext({});
-const peerConnectionRef = createRef();
+const peerConnectionRef = createRef<RTCPeerConnection | null>();
 
 export const RTCPeerConnectionContextProvider = ({
   children,
@@ -16,4 +16,4 @@ export const RTCPeerConnectionContextProvider = ({
 };
 
 export const useRTCPeerConnectionContext = () =>
-  useContext(RTCPeerConnectionContext);
+  useContext(RTCPeerConnectionContext) as MutableRefObject<RTCPeerConnection>;

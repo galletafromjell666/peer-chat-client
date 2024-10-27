@@ -1,10 +1,8 @@
 import { useState } from "react";
-import useRTCAndSocketIOEvents from "./hooks/useRTCAndSocketIOEvents";
 import Child from "./Child";
 
 function App() {
   const [messages, setMessages] = useState([]);
-  useRTCAndSocketIOEvents();
 
   const sendMessage = () => {
     console.log("TO DO!");
