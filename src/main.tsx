@@ -1,13 +1,16 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
+import { RTCPeerConnectionContextProvider } from "./hooks/useRTCConnectionContext.tsx";
 import { SocketIOProvider } from "./hooks/useSocketIO.tsx";
+import App from "./App.tsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <SocketIOProvider>
-      <App />
+      <RTCPeerConnectionContextProvider>
+        <App />
+      </RTCPeerConnectionContextProvider>
     </SocketIOProvider>
   </StrictMode>
 );

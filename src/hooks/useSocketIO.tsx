@@ -2,8 +2,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 import SocketIoClient from "../utils/socketIOInstance";
 
 // Uses the socketIO instance from utils
-export function useSocketIo(configParam?: any) {
-  const [config, setConfig] = useState(configParam);
+export function useSocketIo(configParams?: any) {
+  const [config, setConfig] = useState(configParams);
   const [client, setClient] = useState<SocketIoClient>();
 
   useEffect(() => {
