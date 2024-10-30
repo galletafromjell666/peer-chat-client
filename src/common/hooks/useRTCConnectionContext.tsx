@@ -9,7 +9,6 @@ const RTCPeerConnectionContext = createContext({});
 const peerConnectionRef = createRef<RTCPeerConnection | null>();
 const dataChannelRef = createRef<RTCDataChannel | null>();
 
-console.log("ref created", { peerConnectionRef, dataChannelRef });
 export const RTCPeerConnectionContextProvider = ({
   children,
 }: {
@@ -19,7 +18,7 @@ export const RTCPeerConnectionContextProvider = ({
     peerConnectionRef,
     dataChannelRef,
   };
-  console.log("value!", value);
+
   return (
     <RTCPeerConnectionContext.Provider value={value}>
       {children}

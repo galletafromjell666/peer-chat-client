@@ -1,6 +1,6 @@
 import { Button } from "antd";
 
-import useRTCAndSocketIOEvents from "./hooks/useRTCAndSocketIOEvents";
+import useRTCAndSocketIOEvents from "./common/hooks/useRTCAndSocketIOEvents";
 
 function Child() {
   const x = useRTCAndSocketIOEvents();
