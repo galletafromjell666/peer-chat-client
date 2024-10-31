@@ -8,15 +8,15 @@ const { useToken } = theme;
 
 function CreateAndJoin() {
   const [joinConferenceId, setJoinConferenceId] = useState("");
-  const actions = useSocketIOConfigActions();
+  const socketIOActions = useSocketIOConfigActions();
   const { token } = useToken();
 
   const handleCreate = () => {
-    actions.createRoom();
+    socketIOActions.createRoom();
   };
 
   const handleJoin = () => {
-    actions.joinRoom();
+    socketIOActions.joinRoom();
   };
 
   const handleJoinInput = (e: React.ChangeEvent<HTMLInputElement>) => {

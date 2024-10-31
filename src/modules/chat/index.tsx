@@ -3,12 +3,16 @@ import { useRTCAndSocketIOEvents } from "../../common/hooks/useRTCAndSocketIOEve
 import { SocketIOProvider } from "../../common/hooks/useSocketIO";
 import { RTCPeerConnectionContextProvider } from "../../common/hooks/useRTCConnectionContext";
 
-const ChatRootComponent = () => {
+export const ChatOutletSocketIOEvents = () => {
   useRTCAndSocketIOEvents();
+  return <Outlet />;
+};
+
+const ChatRootComponent = () => {
   return (
     <SocketIOProvider>
       <RTCPeerConnectionContextProvider>
-        <Outlet />
+        <ChatOutletSocketIOEvents />
       </RTCPeerConnectionContextProvider>
     </SocketIOProvider>
   );

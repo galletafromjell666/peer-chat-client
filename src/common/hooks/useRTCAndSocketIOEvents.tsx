@@ -14,8 +14,9 @@ export function useRTCAndSocketIOEvents() {
   const { client: socketIOClient } = useSocketIoClient();
   const { peerConnectionRef, dataChannelRef } = useRTCPeerConnectionContext();
 
-  console.log({ peerConnectionRef, dataChannelRef });
+  console.log("useRTCAndSocketIOEvents", { peerConnectionRef, dataChannelRef, socketIOClient });
   useEffect(() => {
+    console.log("useEffect!", socketIOClient)
     if (!socketIOClient) return;
 
     console.log("BackgroundEvents init!", socketIOClient);
@@ -133,7 +134,7 @@ export function useRTCAndSocketIOEvents() {
     return () => {
       console.log("unsubscribe!");
     };
-  }, [socketIOClient?.socket?.connected]);
+  }, [socketIOClient]);
 }
 
 export function useSocketIOConfigActions() {
