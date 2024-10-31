@@ -10,9 +10,8 @@ const peerConfiguration = {
   ],
 };
 
-function useRTCAndSocketIOEvents() {
-  // TODO: Separate the actions and the basic listeners, so the actions can be called in any place! without causing a rerender.
-  const { setConfig, client: socketIOClient } = useSocketIoClient();
+export function useRTCAndSocketIOEvents() {
+  const { client: socketIOClient } = useSocketIoClient();
   const { peerConnectionRef, dataChannelRef } = useRTCPeerConnectionContext();
 
   console.log({ peerConnectionRef, dataChannelRef });
@@ -135,6 +134,10 @@ function useRTCAndSocketIOEvents() {
       console.log("unsubscribe!");
     };
   }, [socketIOClient?.socket?.connected]);
+}
+
+export function useSocketIOConfigActions() {
+  const { setConfig } = useSocketIoClient();
 
   const joinRoom = () => {
     setConfig({
@@ -153,5 +156,3 @@ function useRTCAndSocketIOEvents() {
   };
   return { createRoom, joinRoom };
 }
-
-export default useRTCAndSocketIOEvents;

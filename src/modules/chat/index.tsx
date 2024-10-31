@@ -1,10 +1,17 @@
-import { useParams } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import { useRTCAndSocketIOEvents } from "../../common/hooks/useRTCAndSocketIOEvents";
+import { SocketIOProvider } from "../../common/hooks/useSocketIO";
+import { RTCPeerConnectionContextProvider } from "../../common/hooks/useRTCConnectionContext";
 
-// TODO: check if the room exists or is it full and if not show a toast or something while redirecting
-function Chat() {
-  const params = useParams();
-  console.log("chat id: ", params?.chatId);
-  return <div>index</div>;
-}
+const ChatRootComponent = () => {
+  useRTCAndSocketIOEvents();
+  return (
+    <SocketIOProvider>
+      <RTCPeerConnectionContextProvider>
+        <Outlet />
+      </RTCPeerConnectionContextProvider>
+    </SocketIOProvider>
+  );
+};
 
-export default Chat;
+export default ChatRootComponent;

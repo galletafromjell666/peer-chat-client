@@ -1,9 +1,8 @@
 import { Button } from "antd";
-
-import useRTCAndSocketIOEvents from "./common/hooks/useRTCAndSocketIOEvents";
+import { useSocketIOConfigActions } from "./common/hooks/useRTCAndSocketIOEvents";
 
 function Child() {
-  const x = useRTCAndSocketIOEvents();
+  const x = useSocketIOConfigActions();
   const handleCreate = () => {
     x.createRoom();
   };
@@ -11,6 +10,7 @@ function Child() {
   const handleJoin = () => {
     x.joinRoom();
   };
+
   return (
     <div>
       <Button onClick={handleCreate}>Create Room 11</Button>

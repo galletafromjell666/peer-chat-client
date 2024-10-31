@@ -1,8 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SocketIoClient from "../utils/socketIOInstance";
 
 // Uses the socketIO instance from utils
 export function useSocketIo(configParams?: any) {
+  const navigate = useNavigate();
   const [config, setConfig] = useState(configParams);
   const [client, setClient] = useState<SocketIoClient>();
 
@@ -16,11 +18,16 @@ export function useSocketIo(configParams?: any) {
     console.log("creating new SocketIO client with config: ", config);
     const newClient = new SocketIoClient(config);
 
-    newClient.on("connect", () => {
+    newClient.subscribe("connect", () => {
       console.log("Socket.io client connected");
     });
 
-    newClient.on("disconnect", () => {
+    newClient.subscribe("new-room", (data) => {
+      console.log(`Room created ${data} navigating to it`);
+      navigate(`/chat/${data}`);
+    });
+
+    newClient.subscribe("disconnect", () => {
       console.log("Socket.io client disconnected");
     });
 

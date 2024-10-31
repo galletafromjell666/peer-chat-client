@@ -1,24 +1,35 @@
-import { useState } from "react";
-import Child from "./Child";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { RTCPeerConnectionContextProvider } from "./common/hooks/useRTCConnectionContext.tsx";
+import CreateAndJoin from "./modules/chat/components/createAndJoin/index.tsx";
+import Conversation from "./modules/chat/components/conversation/index.tsx";
+import ChatRootComponent from "./modules/chat/index.tsx";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <h1>some nice intro</h1>,
+  },
+  {
+    path: "chat",
+    element: <ChatRootComponent />,
+    children: [
+      {
+        path: "create-join",
+        element: <CreateAndJoin />,
+      },
+      {
+        path: ":chatId",
+        element: <Conversation />,
+      },
+    ],
+  },
+]);
 
 function App() {
-  const [messages, setMessages] = useState([]);
-
-  const sendMessage = () => {
-    console.log("TO DO!");
-  };
-
   return (
-    <div>
-      <Child />
-      <h1>peer-chat-client!</h1>
-      <input placeholder="Message" />
-      <button onClick={sendMessage}>Send message</button>
-      <h1>Messages:</h1>
-      {messages.map((m) => (
-        <p>{m}</p>
-      ))}
-    </div>
+    <RTCPeerConnectionContextProvider>
+      <RouterProvider router={router} />
+    </RTCPeerConnectionContextProvider>
   );
 }
 
