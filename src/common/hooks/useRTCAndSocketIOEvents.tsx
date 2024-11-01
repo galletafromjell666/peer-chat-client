@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useSocketIoClient } from "./useSocketIO";
-import { useRTCPeerConnectionContext } from "./useRTCConnectionContext";
+import { useSocketIoClient } from "./useSocketIOContextValue";
+import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
 
 const peerConfiguration = {
   iceServers: [
@@ -12,30 +12,35 @@ const peerConfiguration = {
 
 export function useRTCAndSocketIOEvents() {
   const { client: socketIOClient } = useSocketIoClient();
-  const { peerConnectionRef, dataChannelRef } = useRTCPeerConnectionContext();
+  const { peerConnectionRef, dataChannelRef } =
+    useRTCPeerConnectionContextValue();
 
-  console.log("useRTCAndSocketIOEvents", { peerConnectionRef, dataChannelRef, socketIOClient });
+  console.log("useRTCAndSocketIOEvents", {
+    peerConnectionRef,
+    dataChannelRef,
+    socketIOClient,
+  });
   useEffect(() => {
-    console.log("useEffect!", socketIOClient)
+    console.log("useEffect!", socketIOClient);
     if (!socketIOClient) return;
 
     console.log("BackgroundEvents init!", socketIOClient);
 
-    const onChannelOpen = (e) => {
+    const onChannelOpen = (e: any) => {
       console.log("Data channel is open", e);
     };
 
-    const onChannelClose = (e) => {
+    const onChannelClose = (e: any) => {
       console.log("Data channel is closed", e);
     };
 
-    const onChannelError = (e) => {
+    const onChannelError = (e: any) => {
       console.error("Data channel error", e);
     };
 
-    const onChannelMessage = (e) => {
+    const onChannelMessage = (e: any) => {
       console.log("Data channel message", e);
-      messages.textContent += "Received message: " + e.data + "\n";
+      // messages.textContent += "Received message: " + e.data + "\n";
     };
 
     const startWebRTC = async (offerData = null, iceCandidates = []) => {
@@ -46,7 +51,7 @@ export function useRTCAndSocketIOEvents() {
       dataChannelRef.current =
         peerConnectionRef.current.createDataChannel("chat");
 
-      peerConnectionRef.current.ondatachannel = (e) => {
+      peerConnectionRef.current.ondatachannel = (e: any) => {
         console.log("Callee has received a data channel event");
         const receiveChannel = e.channel;
         receiveChannel.onmessage = onChannelMessage;
@@ -57,7 +62,7 @@ export function useRTCAndSocketIOEvents() {
 
       // addLogs();
 
-      peerConnectionRef.current.addEventListener("icecandidate", (e) => {
+      peerConnectionRef.current.addEventListener("icecandidate", (e: any) => {
         if (e.candidate) {
           console.log("Sending ICE Candidate to signaling server", e.candidate);
           socketIOClient.send("send-candidate-to-signaling", e.candidate);
@@ -101,7 +106,7 @@ export function useRTCAndSocketIOEvents() {
     };
 
     // init
-    const handleInitEvent = (data: unknown) => {
+    const handleInitEvent = (data: any) => {
       console.log("Received init", data);
       startWebRTC(data?.offer, data?.iceCandidates);
     };
@@ -109,7 +114,7 @@ export function useRTCAndSocketIOEvents() {
     socketIOClient.subscribe("init", handleInitEvent);
 
     // receive candidate
-    const handleReceiveCandidate = async (data: unknown) => {
+    const handleReceiveCandidate = async (data: any) => {
       console.log(
         "Received ICE candidate from signaling server",
         data.usernameFragment
@@ -125,7 +130,7 @@ export function useRTCAndSocketIOEvents() {
     socketIOClient.subscribe("receive-candidate", handleReceiveCandidate);
 
     // receive answer
-    const handleReceiveAnswer = (data: unknown) => {
+    const handleReceiveAnswer = (data: any) => {
       console.log("caller has received an answer from signaling server");
       peerConnectionRef.current.setRemoteDescription(data);
     };
@@ -135,25 +140,4 @@ export function useRTCAndSocketIOEvents() {
       console.log("unsubscribe!");
     };
   }, [socketIOClient]);
-}
-
-export function useSocketIOConfigActions() {
-  const { setConfig } = useSocketIoClient();
-
-  const joinRoom = () => {
-    setConfig({
-      query: {
-        roomId: "11",
-      },
-    });
-  };
-
-  const createRoom = () => {
-    setConfig({
-      query: {
-        action: "create",
-      },
-    });
-  };
-  return { createRoom, joinRoom };
 }

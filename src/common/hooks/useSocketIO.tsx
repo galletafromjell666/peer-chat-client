@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SocketIoClient from "../utils/socketIOInstance";
 
@@ -42,21 +42,3 @@ export function useSocketIo(configParams?: any) {
   return { client: client as SocketIoClient, setConfig };
 }
 
-// Creates a new context for the socketIO instance
-const socketIoContext = createContext<{
-  client: SocketIoClient | null;
-  setConfig: any;
-}>({ client: null, setConfig: null });
-
-export function useSocketIoClient() {
-  return useContext(socketIoContext);
-}
-
-export function SocketIOProvider({ children }: { children?: React.ReactNode }) {
-  const { client, setConfig } = useSocketIo();
-  return (
-    <socketIoContext.Provider value={{ client, setConfig }}>
-      {children}
-    </socketIoContext.Provider>
-  );
-}

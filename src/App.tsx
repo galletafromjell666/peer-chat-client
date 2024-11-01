@@ -1,5 +1,4 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { RTCPeerConnectionContextProvider } from "./common/hooks/useRTCConnectionContext.tsx";
 import CreateAndJoin from "./modules/chat/components/createAndJoin/index.tsx";
 import Conversation from "./modules/chat/components/conversation/index.tsx";
 import ChatRootComponent from "./modules/chat/index.tsx";
@@ -26,11 +25,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return (
-    <RTCPeerConnectionContextProvider>
-      <RouterProvider router={router} />
-    </RTCPeerConnectionContextProvider>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
