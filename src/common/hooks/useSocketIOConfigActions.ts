@@ -1,7 +1,7 @@
-import { useSocketIoClient } from "./useSocketIOContextValue";
+import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 
 export function useSocketIOConfigActions() {
-  const { setConfig } = useSocketIoClient();
+  const { setConfig } = useSocketIoClientContextValue();
 
   const joinRoom = () => {
     setConfig({

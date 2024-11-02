@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSocketIoClient } from "./useSocketIOContextValue";
+import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
 
 const peerConfiguration = {
@@ -11,7 +11,7 @@ const peerConfiguration = {
 };
 
 export function useRTCAndSocketIOEvents() {
-  const { client: socketIOClient } = useSocketIoClient();
+  const { client: socketIOClient } = useSocketIoClientContextValue();
   const { peerConnectionRef, dataChannelRef } =
     useRTCPeerConnectionContextValue();
 
@@ -21,7 +21,6 @@ export function useRTCAndSocketIOEvents() {
     socketIOClient,
   });
   useEffect(() => {
-    console.log("useEffect!", socketIOClient);
     if (!socketIOClient) return;
 
     console.log("BackgroundEvents init!", socketIOClient);

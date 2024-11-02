@@ -45,6 +45,18 @@ export default class SocketIoClient extends EventEmitter {
       console.warn("socketIO disconnected ", reason);
       this.emit("disconnect", reason);
     });
+
+    this.socket.on("connect_error", (err) => {
+      // the reason of the error, for example "xhr poll error"
+      console.log("full error", err)
+      console.log("message", err.message);
+
+      // some additional description, for example the status code of the initial HTTP response
+      console.log("desc",err?.description);
+
+      // some additional context, for example the XMLHttpRequest object
+      console.log("context",err?.context);
+    });
   }
 
   public disconnect() {
