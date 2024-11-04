@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import CreateAndJoin from "./modules/chat/components/createAndJoin/index.tsx";
 import Conversation from "./modules/chat/components/conversation/index.tsx";
 import ChatRootComponent from "./modules/chat/index.tsx";
+import Invalid from "./modules/chat/components/invalid/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
       {
         path: ":chatId",
         element: <Conversation />,
+      },
+      {
+        path: ":chatId/invalid",
+        element: <Invalid />,
       },
     ],
   },
