@@ -54,6 +54,46 @@ function Conversation() {
         "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
       timestamp: "2024-08-17T22:55:12.432Z",
     },
+    {
+      sender: "Giovanni Aguirre",
+      senderId: 1,
+      message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
+      timestamp: "2024-08-17T22:54:23.831Z",
+    },
+    {
+      sender: "Aurelio Bottas",
+      senderId: 2,
+      message:
+        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi ",
+      timestamp: "2024-08-17T22:55:12.432Z",
+    },
+    {
+      sender: "Aurelio Bottas",
+      senderId: 2,
+      message:
+        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque.",
+      timestamp: "2024-08-17T22:55:12.432Z",
+    },
+    {
+      sender: "Giovanni Aguirre",
+      senderId: 1,
+      message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
+      timestamp: "2024-08-17T22:54:23.831Z",
+    },
+    {
+      sender: "Aurelio Bottas",
+      senderId: 2,
+      message:
+        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque.",
+      timestamp: "2024-08-17T22:55:12.432Z",
+    },
+    {
+      sender: "Giovanni Aguirre",
+      senderId: 1,
+      message:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
+      timestamp: "2024-08-17T22:54:23.831Z",
+    },
   ];
 
   return (
@@ -104,6 +144,7 @@ function Conversation() {
         style={{
           width: "100%",
           maxWidth: "1920px",
+          overflowY: "auto",
         }}
         data-test-id="conversation_area_container"
       >
