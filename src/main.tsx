@@ -8,6 +8,9 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ConfigProvider
       theme={{
+        token: {
+          fontSize: 16,
+        },
         algorithm: theme.darkAlgorithm,
       }}
     >

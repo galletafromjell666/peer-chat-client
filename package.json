@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.5.1",
     "antd": "^5.21.5",
     "events": "^3.3.0",
     "lodash": "^4.17.21",
