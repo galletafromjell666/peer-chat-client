@@ -1,9 +1,13 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Flex, Space, theme, Typography } from "antd";
+import { Button, Flex, Input, Space, theme, Typography } from "antd";
 import { useSocketIoClientContextValue } from "../../../../common/hooks/useSocketIOContextValue";
 import { useSocketIOConfigActions } from "../../../../common/hooks/useSocketIOConfigActions";
-import { AudioOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import {
+  AudioOutlined,
+  FileAddOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
 
 const { useToken } = theme;
 const { Text, Paragraph } = Typography;
@@ -122,51 +126,76 @@ function Conversation() {
           justify="space-between"
           align="center"
           style={{
+            padding: "0.5rem",
             width: "100%",
-            maxWidth: "1920px",
+            maxWidth: "1450px",
           }}
         >
           <Text>This is a chat</Text>
           <Space>
-            <Button
-              shape="circle"
-              size="large"
-              icon={<VideoCameraOutlined />}
-            />
-            <Button shape="circle" size="large" icon={<AudioOutlined />} />
+            <Button shape="circle" icon={<VideoCameraOutlined />} />
+            <Button shape="circle" icon={<AudioOutlined />} />
           </Space>
         </Flex>
       </Flex>
       <Flex
+        style={{
+          width: "100%",
+          overflowY: "auto",
+        }}
         vertical
         justify="space-between"
         align="center"
+      >
+        <Flex
+          vertical
+          justify="space-between"
+          align="center"
+          style={{ maxWidth: "1450px" }}
+          data-test-id="conversation_area_container"
+        >
+          {messages.map((m) => {
+            const isSender = m.senderId === myId;
+            return (
+              <Flex
+                style={{
+                  padding: "1rem",
+                  margin: "1rem 1.2rem",
+                  maxWidth: "45%",
+                  borderRadius: isSender
+                    ? "2rem 2rem 0.3rem 2rem"
+                    : "2rem 2rem 2rem 0.3rem",
+                  backgroundColor: token.colorBgContainerDisabled,
+                  alignSelf: isSender ? "end" : "start",
+                }}
+              >
+                <Paragraph style={{ margin: 0 }}>{m.message}</Paragraph>
+              </Flex>
+            );
+          })}
+        </Flex>
+      </Flex>
+
+      <Flex
+        data-test-id="input-section"
         style={{
           width: "100%",
-          maxWidth: "1920px",
-          overflowY: "auto",
+          maxWidth: "1450px",
         }}
-        data-test-id="conversation_area_container"
       >
-        {messages.map((m) => {
-          const isSender = m.senderId === myId;
-          return (
-            <Flex
-              style={{
-                padding: "1rem",
-                margin: "1rem 1.2rem",
-                maxWidth: "45%",
-                borderRadius: isSender
-                  ? "2rem 2rem 0.3rem 2rem"
-                  : "2rem 2rem 2rem 0.3rem",
-                backgroundColor: token.colorBgContainerDisabled,
-                alignSelf: isSender ? "end" : "start",
-              }}
-            >
-              <Paragraph style={{ margin: 0 }}>{m.message}</Paragraph>
-            </Flex>
-          );
-        })}
+        <Flex
+          style={{
+            padding: "0.65rem 0.5rem",
+            width: "100%",
+            gap: "1rem",
+          }}
+        >
+          <Button shape="circle" icon={<FileAddOutlined />} />
+          <Space.Compact style={{ width: "100%" }}>
+            <Input defaultValue="Combine input and button" />
+            <Button type="primary">Submit</Button>
+          </Space.Compact>
+        </Flex>
       </Flex>
     </Flex>
   );
