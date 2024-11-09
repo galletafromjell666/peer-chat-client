@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
+import { PeerChatDataChannelMessage, PeerChatMessage } from "../../types";
+import { useStoreActions } from "../store";
 
 const peerConfiguration = {
   iceServers: [
@@ -11,6 +13,7 @@ const peerConfiguration = {
 };
 
 export function useRTCAndSocketIOEvents() {
+  const { addMessage } = useStoreActions();
   const { client: socketIOClient } = useSocketIoClientContextValue();
   const { peerConnectionRef, dataChannelRef } =
     useRTCPeerConnectionContextValue();
@@ -20,26 +23,46 @@ export function useRTCAndSocketIOEvents() {
     dataChannelRef,
     socketIOClient,
   });
+
+  const handleMessageChannelMessage = (
+    RTCMessage: PeerChatDataChannelMessage
+  ) => {
+    const { originatorId, timestamp, action, payload } = RTCMessage;
+    if (action === "message") {
+      // this event has a message in its payload!
+      const parsed: PeerChatMessage = {
+        id: payload.id,
+        originatorId,
+        timestamp,
+        message: payload.message,
+      };
+      console.log("adding message to store", parsed);
+      addMessage(parsed);
+    }
+  };
+
   useEffect(() => {
     if (!socketIOClient) return;
 
     console.log("BackgroundEvents init!", socketIOClient);
 
-    const onChannelOpen = (e: any) => {
+    const onChannelOpen = (e: Event) => {
       console.log("Data channel is open", e);
     };
 
-    const onChannelClose = (e: any) => {
+    const onChannelClose = (e: Event) => {
       console.log("Data channel is closed", e);
     };
 
-    const onChannelError = (e: any) => {
+    const onChannelError = (e: Event) => {
       console.error("Data channel error", e);
     };
 
-    const onChannelMessage = (e: any) => {
+    const onChannelMessage = (e: MessageEvent) => {
       console.log("Data channel message", e);
-      // messages.textContent += "Received message: " + e.data + "\n";
+      const parsedData = JSON.parse(e.data) as PeerChatDataChannelMessage;
+      handleMessageChannelMessage(parsedData);
+      // TODO: Add handlers
     };
 
     const startWebRTC = async (offerData = null, iceCandidates = []) => {
@@ -50,7 +73,7 @@ export function useRTCAndSocketIOEvents() {
       dataChannelRef.current =
         peerConnectionRef.current.createDataChannel("chat");
 
-      peerConnectionRef.current.ondatachannel = (e: any) => {
+      peerConnectionRef.current.ondatachannel = (e: RTCDataChannelEvent) => {
         console.log("Callee has received a data channel event");
         const receiveChannel = e.channel;
         receiveChannel.onmessage = onChannelMessage;
@@ -61,12 +84,18 @@ export function useRTCAndSocketIOEvents() {
 
       // addLogs();
 
-      peerConnectionRef.current.addEventListener("icecandidate", (e: any) => {
-        if (e.candidate) {
-          console.log("Sending ICE Candidate to signaling server", e.candidate);
-          socketIOClient.send("send-candidate-to-signaling", e.candidate);
+      peerConnectionRef.current.addEventListener(
+        "icecandidate",
+        (e: RTCPeerConnectionIceEvent) => {
+          if (e.candidate) {
+            console.log(
+              "Sending ICE Candidate to signaling server",
+              e.candidate
+            );
+            socketIOClient.send("send-candidate-to-signaling", e.candidate);
+          }
         }
-      });
+      );
 
       if (!offerData) {
         /*

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Flex, Input, Space, theme, Typography } from "antd";
 import { useSocketIoClientContextValue } from "../../../../common/hooks/useSocketIOContextValue";
@@ -8,15 +8,34 @@ import {
   FileAddOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
+import { useRTCPeerConnectionContextValue } from "../../../../common/hooks/useRTCConnectionContextValue";
+import { PeerChatDataChannelMessage  } from "../../../../types";
 
 const { useToken } = theme;
 const { Text, Paragraph } = Typography;
 
 function Conversation() {
   const { token } = useToken();
+  const [message, setMessage] = useState("");
+  const { dataChannelRef } = useRTCPeerConnectionContextValue();
   const { client: socketIOClient } = useSocketIoClientContextValue();
   const socketIOActions = useSocketIOConfigActions();
   const params = useParams();
+
+  const sendMessageToPeer = () => {
+    console.log("sending message");
+    const craftedMessage: PeerChatDataChannelMessage = {
+      originatorId: "1",
+      action: "message",
+      payload: {
+        message,
+      },
+      timestamp: Date.now(),
+    };
+    dataChannelRef.current.send(JSON.stringify(craftedMessage));
+    setMessage("");
+  };
+
   useEffect(() => {
     console.log("Mounting conversation component, chat id", params?.chatId);
     console.log(params?.chatId, socketIOClient);
@@ -192,8 +211,15 @@ function Conversation() {
         >
           <Button shape="circle" icon={<FileAddOutlined />} />
           <Space.Compact style={{ width: "100%" }}>
-            <Input defaultValue="Combine input and button" />
-            <Button type="primary">Submit</Button>
+            <Input
+              onChange={(e) => {
+                setMessage(e.target.value);
+              }}
+              value={message}
+            />
+            <Button type="primary" onClick={sendMessageToPeer}>
+              Submit
+            </Button>
           </Space.Compact>
         </Flex>
       </Flex>
