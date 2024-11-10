@@ -1,8 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import CreateAndJoin from "./modules/chat/components/createAndJoin/index.tsx";
-import Conversation from "./modules/chat/components/conversation/index.tsx";
-import ChatRootComponent from "./modules/chat/index.tsx";
-import Invalid from "./modules/chat/components/invalid/index.tsx";
+import ChatRootComponent from "@modules/chat/";
+import Invalid from "./modules/chat/components/invalid/";
+import Conversation from "@modules/chat/components/conversation";
+import CreateAndJoin from "@modules/chat/components/createAndJoin";
 
 const router = createBrowserRouter([
   {
