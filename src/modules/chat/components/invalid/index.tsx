@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Flex, Typography, theme } from "antd";
+import { Button, Flex, theme,Typography } from "antd";
 const { Text, Title } = Typography;
 const { useToken } = theme;
 

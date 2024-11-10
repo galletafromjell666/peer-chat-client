@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Flex, theme } from "antd";
 import { useSocketIOConfigActions } from "@common/hooks/useSocketIOConfigActions";
 import { useSocketIoClientContextValue } from "@common/hooks/useSocketIOContextValue";
+import { Flex, theme } from "antd";
+
+import Header from "./components/Header";
 import MessageComposer from "./components/MessageComposer";
 import MessageHistory from "./components/MessageHistory";
-import Header from "./components/Header";
 
 const { useToken } = theme;
 

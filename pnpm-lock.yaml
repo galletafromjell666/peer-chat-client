@@ -63,6 +63,9 @@ importers:
       eslint-plugin-react-refresh:
         specifier: ^0.4.13
         version: 0.4.13(eslint@9.13.0)
+      eslint-plugin-simple-import-sort:
+        specifier: ^12.1.1
+        version: 12.1.1(eslint@9.13.0)
       globals:
         specifier: ^15.9.0
         version: 15.11.0
@@ -907,6 +910,11 @@ packages:
     resolution: {integrity: sha512-f1EppwrpJRWmqDTyvAyomFVDYRtrS7iTEqv3nokETnMiMzs2SSTmKRTACce4O2p4jYyowiSMvpdwC/RLcMFhuQ==}
     peerDependencies:
       eslint: '>=7'
+
+  eslint-plugin-simple-import-sort@12.1.1:
+    resolution: {integrity: sha512-6nuzu4xwQtE3332Uz0to+TxDQYRLTKRESSc2hefVT48Zc8JthmN23Gx9lnYhu0FtkRSL1oxny3kJ2aveVhmOVA==}
+    peerDependencies:
+      eslint: '>=5.0.0'
 
   eslint-scope@8.1.0:
     resolution: {integrity: sha512-14dSvlhaVhKKsa9Fx1l8A17s7ah7Ef7wCakJ10LYk6+GYmP9yDti2oq2SEwcyndt6knfcZyhyxwY3i9yL78EQw==}
@@ -2603,6 +2611,10 @@ snapshots:
       eslint: 9.13.0
 
   eslint-plugin-react-refresh@0.4.13(eslint@9.13.0):
+    dependencies:
+      eslint: 9.13.0
+
+  eslint-plugin-simple-import-sort@12.1.1(eslint@9.13.0):
     dependencies:
       eslint: 9.13.0
 

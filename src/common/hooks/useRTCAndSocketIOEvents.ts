@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { useStoreActions } from "@common/store";
 import { transformDataChannelMessageToPeerChatMessage } from "@common/utils/messaging";
+import { PeerChatDataChannelMessage } from "@peer-chat-types/index";
+
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
-import { PeerChatDataChannelMessage } from "@peer-chat-types/index";
 
 const peerConfiguration = {
   iceServers: [

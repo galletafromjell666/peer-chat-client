@@ -1,8 +1,9 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ChatRootComponent from "@modules/chat/";
-import Invalid from "./modules/chat/components/invalid/";
 import Conversation from "@modules/chat/components/conversation";
 import CreateAndJoin from "@modules/chat/components/createAndJoin";
+
+import Invalid from "./modules/chat/components/invalid/";
 
 const router = createBrowserRouter([
   {

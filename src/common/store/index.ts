@@ -1,6 +1,6 @@
-import { create } from "zustand";
 import { PeerChatMessage, PeerChatUser } from "@peer-chat-types/index";
 import { AppState, Store } from "@peer-chat-types/store";
+import { create } from "zustand";
 
 const initialState: AppState = {
   messages: [],

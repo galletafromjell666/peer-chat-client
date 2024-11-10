@@ -1,5 +1,5 @@
-import io, { Socket } from "socket.io-client";
 import { EventEmitter } from "events";
+import io, { Socket } from "socket.io-client";
 
 interface SocketIOClientConfig {
   // token: string;
