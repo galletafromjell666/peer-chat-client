@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
-import { PeerChatDataChannelMessage, PeerChatMessage } from "../../types";
+import { PeerChatDataChannelMessage } from "../../types";
 import { useStoreActions } from "../store";
+import { transformDataChannelMessageToPeerChatMessage } from "../utils/messaging";
 
 const peerConfiguration = {
   iceServers: [
@@ -27,17 +28,15 @@ export function useRTCAndSocketIOEvents() {
   const handleMessageChannelMessage = (
     RTCMessage: PeerChatDataChannelMessage
   ) => {
-    const { originatorId, timestamp, action, payload } = RTCMessage;
+    const { action } = RTCMessage;
     if (action === "message") {
       // this event has a message in its payload!
-      const parsed: PeerChatMessage = {
-        id: payload.id,
-        originatorId,
-        timestamp,
-        message: payload.message,
-      };
-      console.log("adding message to store", parsed);
-      addMessage(parsed);
+      const peerChatMessage = transformDataChannelMessageToPeerChatMessage(
+        RTCMessage,
+        socketIOClient!
+      );
+      console.log("adding message to store", peerChatMessage);
+      addMessage(peerChatMessage);
     }
   };
 

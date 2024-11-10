@@ -8,6 +8,7 @@ export interface PeerChatMessage {
   message: string;
   originatorId: string;
   timestamp: number;
+  isReceived?: boolean;
 }
 
 export interface PeerChatDataChannelMessage {
