@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Flex, theme } from "antd";
-import { useSocketIoClientContextValue } from "../../../../common/hooks/useSocketIOContextValue";
-import { useSocketIOConfigActions } from "../../../../common/hooks/useSocketIOConfigActions";
+import { useSocketIOConfigActions } from "@common/hooks/useSocketIOConfigActions";
+import { useSocketIoClientContextValue } from "@common/hooks/useSocketIOContextValue";
 import MessageComposer from "./components/MessageComposer";
 import MessageHistory from "./components/MessageHistory";
 import Header from "./components/Header";

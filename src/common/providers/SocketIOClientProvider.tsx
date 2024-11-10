@@ -1,5 +1,6 @@
-import { socketIoContext } from "../contexts/socketIOContext";
-import { useSocketIo } from "../hooks/useSocketIO";
+import { socketIoContext } from "@common/contexts/socketIOContext";
+import { useSocketIo } from "@common/hooks/useSocketIO";
+
 
 export function SocketIOProvider({ children }: { children?: React.ReactNode }) {
   const { client, setConfig } = useSocketIo();

@@ -1,5 +1,5 @@
 import { Flex, Typography, theme } from "antd";
-import { useMessages } from "../../../../../common/store";
+import { useMessages } from "@common/store";
 
 const { Paragraph } = Typography;
 const { useToken } = theme;

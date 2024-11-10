@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Flex, Button, Space, Input } from "antd";
 import { FileAddOutlined } from "@ant-design/icons";
-import { PeerChatDataChannelMessage } from "../../../../../types";
-import { transformDataChannelMessageToPeerChatMessage } from "../../../../../common/utils/messaging";
-import { useStoreActions } from "../../../../../common/store";
-import { useRTCPeerConnectionContextValue } from "../../../../../common/hooks/useRTCConnectionContextValue";
-import { useSocketIoClientContextValue } from "../../../../../common/hooks/useSocketIOContextValue";
+import { useRTCPeerConnectionContextValue } from "@common/hooks/useRTCConnectionContextValue";
+import { useSocketIoClientContextValue } from "@common/hooks/useSocketIOContextValue";
+import { useStoreActions } from "@common/store";
+import { transformDataChannelMessageToPeerChatMessage } from "@common/utils/messaging";
+import { PeerChatDataChannelMessage } from "@peer-chat-types/index";
 
 function MessageComposer() {
   const [message, setMessage] = useState("");

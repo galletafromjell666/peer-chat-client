@@ -1,4 +1,4 @@
-import { PeerChatDataChannelMessage, PeerChatMessage } from "../../types";
+import { PeerChatDataChannelMessage } from "@peer-chat-types/index";
 import SocketIoClient from "./socketIOInstance";
 
 export const transformDataChannelMessageToPeerChatMessage = (

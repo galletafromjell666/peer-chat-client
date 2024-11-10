@@ -1,5 +1,5 @@
+import { RTCPeerConnectionContext } from "@common/contexts/RTCPeerConnectionContext";
 import { createRef } from "react";
-import { RTCPeerConnectionContext } from "../contexts/RTCPeerConnectionContext";
 
 const peerConnectionRef = createRef<RTCPeerConnection | null>();
 const dataChannelRef = createRef<RTCDataChannel | null>();

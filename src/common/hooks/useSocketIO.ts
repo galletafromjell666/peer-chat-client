@@ -1,6 +1,6 @@
+import SocketIoClient from "@common/utils/socketIOInstance";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import SocketIoClient from "../utils/socketIOInstance";
 
 // Uses the socketIO instance from utils
 export function useSocketIo(configParams?: any) {

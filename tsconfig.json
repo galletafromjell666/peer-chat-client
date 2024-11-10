@@ -19,7 +19,7 @@
     "paths": {
       "@common/*": ["./src/common/*"],
       "@modules/*": ["./src/modules/*"],
-      "@types/*": ["./src/modules/*"],
+      "@peer-chat-types/*": ["./src/types/*"],
     }
   },
   "include": ["./**/*.ts", "./**/*.tsx"],

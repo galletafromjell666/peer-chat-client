@@ -1,5 +1,5 @@
 import { MutableRefObject, useContext } from "react";
-import { RTCPeerConnectionContext } from "../contexts/RTCPeerConnectionContext";
+import { RTCPeerConnectionContext } from "@common/contexts/RTCPeerConnectionContext";
 
 export const useRTCPeerConnectionContextValue = () =>
   useContext(RTCPeerConnectionContext) as {

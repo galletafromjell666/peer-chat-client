@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
-import { useRTCAndSocketIOEvents } from "../../common/hooks/useRTCAndSocketIOEvents";
-import { SocketIOProvider } from "../../common/providers/SocketIOClientProvider";
-import { RTCPeerConnectionContextProvider } from "../../common/providers/RTCPeerConnectionProvider";
+import { useRTCAndSocketIOEvents } from "@common/hooks/useRTCAndSocketIOEvents";
+import { RTCPeerConnectionContextProvider } from "@common/providers/RTCPeerConnectionProvider";
+import { SocketIOProvider } from "@common/providers/SocketIOClientProvider";
 
 export const ChatOutletSocketIOEvents = () => {
   useRTCAndSocketIOEvents();

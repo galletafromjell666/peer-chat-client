@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { isEmpty } from "lodash";
 import { Button, Card, Flex, Input, Typography, theme } from "antd";
-import { useSocketIOConfigActions } from "../../../../common/hooks/useSocketIOConfigActions";
+import { useSocketIOConfigActions } from "@common/hooks/useSocketIOConfigActions";
+
 
 const { Text } = Typography;
 const { useToken } = theme;

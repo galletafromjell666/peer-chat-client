@@ -1,5 +1,6 @@
 import { createContext } from "react";
-import SocketIoClient from "../utils/socketIOInstance";
+import SocketIoClient from "@common/utils/socketIOInstance";
+
 
 export const socketIoContext = createContext<{
   client: SocketIoClient | null;
