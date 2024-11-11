@@ -3,7 +3,11 @@ import { FileAddOutlined } from "@ant-design/icons";
 import { useRTCPeerConnectionContextValue } from "@common/hooks/useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "@common/hooks/useSocketIOContextValue";
 import { useStoreActions } from "@common/store";
-import { transformDataChannelMessageToPeerChatMessage } from "@common/utils/messaging";
+import { getDataDownloadUrl } from "@common/utils/files";
+import {
+  transformDataChannelFileMessagesToPeerChatMessage,
+  transformDataChannelMessageToPeerChatMessage,
+} from "@common/utils/messaging";
 import {
   PeerChatDataChannelMessage,
   PeerChatFileData,
@@ -19,7 +23,7 @@ function MessageComposer() {
   const [message, setMessage] = useState("");
   const [fileList, setFileList] = useState<RcFile[]>([]);
 
-  const { addMessage } = useStoreActions();
+  const { addMessage, updateMessage } = useStoreActions();
   const { dataChannelRef } = useRTCPeerConnectionContextValue();
   const { client: socketIOClient } = useSocketIoClientContextValue();
 
@@ -47,6 +51,13 @@ function MessageComposer() {
 
       // Sending file metadata
       dataChannel.send(JSON.stringify(fileMetadata));
+      // Add to sender state
+      addMessage(
+        transformDataChannelFileMessagesToPeerChatMessage(
+          fileMetadata,
+          socketIOClient!
+        )
+      );
 
       // Set up file reading
       const reader = new FileReader();
@@ -92,6 +103,11 @@ function MessageComposer() {
           dataChannel.send(JSON.stringify(completeMessage));
           setFileList([]);
           console.log("File send complete");
+          const url = getDataDownloadUrl(file);
+          const updatedMessage = {
+            fileData: { status: "complete", url } as PeerChatFileData,
+          };
+          updateMessage(fileId, updatedMessage);
         }
       };
 

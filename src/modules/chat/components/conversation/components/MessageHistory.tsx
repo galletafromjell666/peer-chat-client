@@ -79,7 +79,9 @@ function MessageHistory() {
                         loading={m.fileData?.status !== "complete"}
                         iconPosition="end"
                       >
-                        Download
+                        {isOutboundMessage && m.fileData?.status !== "complete"
+                          ? "Uploading"
+                          : "Download"}
                       </Button>
                     </div>
                   </Flex>

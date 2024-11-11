@@ -61,10 +61,9 @@ export function useRTCAndSocketIOEvents() {
         offset += chunk.byteLength;
       }
 
-      const url = getDataDownloadUrl(fileData, inComingFile.current.name);
+      const url = getDataDownloadUrl(fileData, inComingFile.current.type);
 
       const updatedMessageWithUrl = {
-        ...{},
         fileData: { url, status: "complete" } as PeerChatFileData,
       };
       console.log("message with url", updatedMessageWithUrl);
@@ -111,7 +110,7 @@ export function useRTCAndSocketIOEvents() {
 
         // Calculate and log progress
         const progress = (
-          (receivedSize.current.receivedSize / inComingFile?.current?.size) *
+          (receivedSize.current / inComingFile?.current?.size) *
           100
         ).toFixed(2);
         console.log(`Receive progress: ${progress}%`);
