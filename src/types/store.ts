@@ -7,8 +7,9 @@ export interface AppState {
 
 export type AppStateActions = {
   addMessage: (message: PeerChatMessage) => void;
+  updateMessage: (id: string, message: Partial<PeerChatMessage>) => void;
   addUser: (user: PeerChatUser) => void;
-  updateUser: (id: string, newUser: PeerChatUser) => void;
+  updateUser: (id: string, newUser: Partial<PeerChatUser>) => void;
 };
 
 export type Store = AppState & {

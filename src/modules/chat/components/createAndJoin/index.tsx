@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSocketIOConfigActions } from "@common/hooks/useSocketIOConfigActions";
-import { Button, Card, Flex, Input, theme,Typography } from "antd";
+import { Button, Card, Flex, Input, theme, Typography } from "antd";
 import { isEmpty } from "lodash";
-
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -10,6 +10,7 @@ const { useToken } = theme;
 function CreateAndJoin() {
   const [joinConferenceId, setJoinConferenceId] = useState("");
   const socketIOActions = useSocketIOConfigActions();
+  const navigate = useNavigate();
   const { token } = useToken();
 
   const handleCreate = () => {
@@ -17,15 +18,16 @@ function CreateAndJoin() {
   };
 
   const handleJoin = () => {
-    socketIOActions.joinRoom();
+    navigate(`/chat/${joinConferenceId}`);
   };
 
   const handleJoinInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setJoinConferenceId(e.target.value);
   };
 
+  // TODO: Update this to use the real value!!
   const isConferenceIdValid =
-    !isEmpty(joinConferenceId) && joinConferenceId.length > 5;
+    !isEmpty(joinConferenceId) && joinConferenceId.length > 1;
 
   return (
     <Flex

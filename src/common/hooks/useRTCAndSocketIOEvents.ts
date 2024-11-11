@@ -1,7 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useStoreActions } from "@common/store";
-import { transformDataChannelMessageToPeerChatMessage } from "@common/utils/messaging";
-import { PeerChatDataChannelMessage } from "@peer-chat-types/index";
+import { getDataDownloadUrl } from "@common/utils/files";
+import {
+  transformDataChannelFileMessagesToPeerChatMessage,
+  transformDataChannelMessageToPeerChatMessage,
+} from "@common/utils/messaging";
+import {
+  PeerChatDataChannelMessage,
+  PeerChatFileData,
+} from "@peer-chat-types/index";
 
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
@@ -15,21 +22,20 @@ const peerConfiguration = {
 };
 
 export function useRTCAndSocketIOEvents() {
-  const { addMessage } = useStoreActions();
+  const { addMessage, updateMessage } = useStoreActions();
   const { client: socketIOClient } = useSocketIoClientContextValue();
   const { peerConnectionRef, dataChannelRef } =
     useRTCPeerConnectionContextValue();
 
-  console.log("useRTCAndSocketIOEvents", {
-    peerConnectionRef,
-    dataChannelRef,
-    socketIOClient,
-  });
+  const inComingFile = useRef<any>({});
+  const chunks = useRef<any>([]);
+  const receivedSize = useRef<any>(0);
 
   const handleMessageChannelMessage = (
     RTCMessage: PeerChatDataChannelMessage
   ) => {
-    const { action } = RTCMessage;
+    console.log("message!", RTCMessage);
+    const { action, payload } = RTCMessage;
     if (action === "message") {
       // this event has a message in its payload!
       const peerChatMessage = transformDataChannelMessageToPeerChatMessage(
@@ -38,6 +44,32 @@ export function useRTCAndSocketIOEvents() {
       );
       console.log("adding message to store", peerChatMessage);
       addMessage(peerChatMessage);
+    } else if (action === "start") {
+      inComingFile.current = payload;
+      const peerChatMessageWithFile =
+        transformDataChannelFileMessagesToPeerChatMessage(
+          RTCMessage,
+          socketIOClient!
+        );
+      addMessage(peerChatMessageWithFile);
+    } else if (action === "complete") {
+      const fileId = payload.id;
+      const fileData = new Uint8Array(receivedSize.current);
+      let offset = 0;
+      for (const chunk of chunks.current) {
+        fileData.set(new Uint8Array(chunk), offset);
+        offset += chunk.byteLength;
+      }
+
+      const url = getDataDownloadUrl(fileData, inComingFile.current.name);
+
+      const updatedMessageWithUrl = {
+        ...{},
+        fileData: { url, status: "complete" } as PeerChatFileData,
+      };
+      console.log("message with url", updatedMessageWithUrl);
+
+      updateMessage(fileId, updatedMessageWithUrl);
     }
   };
 
@@ -60,8 +92,31 @@ export function useRTCAndSocketIOEvents() {
 
     const onChannelMessage = (e: MessageEvent) => {
       console.log("Data channel message", e);
-      const parsedData = JSON.parse(e.data) as PeerChatDataChannelMessage;
-      handleMessageChannelMessage(parsedData);
+      if (typeof e.data === "string") {
+        const parsedData = JSON.parse(e.data) as PeerChatDataChannelMessage;
+        handleMessageChannelMessage(parsedData);
+      } else if (e.data instanceof ArrayBuffer) {
+        if (!inComingFile?.current) {
+          console.error("Received chunk without file info");
+          return;
+        }
+
+        chunks.current.push(e.data);
+        const { byteLength } = e.data;
+        console.log("increasing receivedSize", {
+          byteLength,
+          current: receivedSize.current,
+        });
+        receivedSize.current = receivedSize.current + byteLength;
+
+        // Calculate and log progress
+        const progress = (
+          (receivedSize.current.receivedSize / inComingFile?.current?.size) *
+          100
+        ).toFixed(2);
+        console.log(`Receive progress: ${progress}%`);
+      }
+
       // TODO: Add handlers
     };
 

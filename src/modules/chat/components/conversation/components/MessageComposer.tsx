@@ -4,15 +4,118 @@ import { useRTCPeerConnectionContextValue } from "@common/hooks/useRTCConnection
 import { useSocketIoClientContextValue } from "@common/hooks/useSocketIOContextValue";
 import { useStoreActions } from "@common/store";
 import { transformDataChannelMessageToPeerChatMessage } from "@common/utils/messaging";
-import { PeerChatDataChannelMessage } from "@peer-chat-types/index";
-import { Button, Flex, Input,Space } from "antd";
+import {
+  PeerChatDataChannelMessage,
+  PeerChatFileData,
+} from "@peer-chat-types/index";
+import { Button, Flex, Input, Space, Tag, Typography, Upload } from "antd";
+import { RcFile } from "antd/es/upload/interface";
+
+const { Text } = Typography;
+
+const CHUNK_SIZE = 16384;
 
 function MessageComposer() {
   const [message, setMessage] = useState("");
+  const [fileList, setFileList] = useState<RcFile[]>([]);
+
+  const { addMessage } = useStoreActions();
   const { dataChannelRef } = useRTCPeerConnectionContextValue();
   const { client: socketIOClient } = useSocketIoClientContextValue();
 
-  const { addMessage } = useStoreActions();
+  const sendFileToPeer = () => {
+    const dataChannel = dataChannelRef.current;
+    const fileId = crypto.randomUUID() as string;
+    const originatorId = socketIOClient?.socket.id ?? "";
+
+    try {
+      const file = fileList[0];
+      // First send the file metadata on the payload
+      const payload: Partial<PeerChatFileData> = {
+        id: fileId,
+        name: file.name,
+        type: file.type,
+        size: file.size,
+      };
+
+      const fileMetadata: PeerChatDataChannelMessage = {
+        payload,
+        originatorId,
+        timestamp: Date.now(),
+        action: "start",
+      };
+
+      // Sending file metadata
+      dataChannel.send(JSON.stringify(fileMetadata));
+
+      // Set up file reading
+      const reader = new FileReader();
+      let offset = 0;
+
+      const readAndSendChunk = () => {
+        const slice = file.slice(offset, offset + CHUNK_SIZE);
+        reader.readAsArrayBuffer(slice);
+      };
+
+      reader.onload = (e) => {
+        const chunk = e.target!.result as ArrayBuffer;
+        dataChannel.send(chunk);
+        offset += chunk.byteLength;
+
+        // Calculate and log progress
+        const progress = ((offset / file.size) * 100).toFixed(2);
+        console.log(`Send progress: ${progress}%`);
+
+        // Continue if there's more to send
+        if (offset < file.size) {
+          // Check channel buffering
+          if (
+            dataChannel.bufferedAmount > dataChannel.bufferedAmountLowThreshold
+          ) {
+            dataChannel.onbufferedamountlow = () => {
+              dataChannel.onbufferedamountlow = null;
+              readAndSendChunk();
+            };
+          } else {
+            readAndSendChunk();
+          }
+        } else {
+          // Send completion message
+          const completeMessage: PeerChatDataChannelMessage = {
+            action: "complete",
+            originatorId,
+            timestamp: Date.now(),
+            payload: {
+              id: fileId,
+            },
+          };
+          dataChannel.send(JSON.stringify(completeMessage));
+          setFileList([]);
+          console.log("File send complete");
+        }
+      };
+
+      reader.onerror = (error) => {
+        // TODO: Show error notification
+        console.error("Error reading file:", error);
+        dataChannel.send(
+          JSON.stringify({ action: "error", error: "File read error" })
+        );
+      };
+
+      // Start the transfer
+      readAndSendChunk();
+    } catch (error) {
+      console.error("Error in file transfer:", error);
+      const errorMessage: PeerChatDataChannelMessage = {
+        action: "error",
+        originatorId,
+        timestamp: Date.now(),
+        payload: {},
+      };
+      dataChannel.send(JSON.stringify(errorMessage));
+    }
+  };
 
   const sendMessageToPeer = () => {
     const craftedMessage: PeerChatDataChannelMessage = {
@@ -25,7 +128,6 @@ function MessageComposer() {
       timestamp: Date.now(),
     };
 
-    // TODO: Update this to send a blob or a buffer array
     const serializedCraftedMessage = JSON.stringify(craftedMessage);
     dataChannelRef.current.send(serializedCraftedMessage);
     addMessage(
@@ -36,6 +138,17 @@ function MessageComposer() {
     );
     setMessage("");
   };
+
+  const handleSubmit = () => {
+    if (fileList.length > 0) {
+      sendFileToPeer();
+      return;
+    }
+    sendMessageToPeer();
+  };
+
+  console.log("files", fileList);
+  const hasFileUploaded = fileList.length > 0;
 
   return (
     <Flex
@@ -52,15 +165,33 @@ function MessageComposer() {
           gap: "1rem",
         }}
       >
-        <Button shape="circle" icon={<FileAddOutlined />} />
-        <Space.Compact style={{ width: "100%" }}>
-          <Input
-            onChange={(e) => {
-              setMessage(e.target.value);
-            }}
-            value={message}
-          />
-          <Button type="primary" onClick={sendMessageToPeer}>
+        <Upload
+          maxCount={1}
+          beforeUpload={(file) => {
+            setFileList([file]);
+            return false;
+          }}
+          fileList={fileList}
+          showUploadList={false}
+        >
+          <Button shape="circle" icon={<FileAddOutlined />} />
+        </Upload>
+        <Space.Compact style={{ width: "100%", justifyContent: "end" }}>
+          {!hasFileUploaded ? (
+            <Input
+              onChange={(e) => {
+                setMessage(e.target.value);
+              }}
+              value={message}
+            />
+          ) : (
+            <div>
+              <Tag closable onClose={() => setFileList([])}>
+                <Text>{fileList[0].name}</Text>
+              </Tag>
+            </div>
+          )}
+          <Button type="primary" onClick={handleSubmit}>
             Submit
           </Button>
         </Space.Compact>
