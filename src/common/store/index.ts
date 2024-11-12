@@ -8,6 +8,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 const initialState: AppState = {
+  isSendingFile: false,
   messages: [],
   users: [],
 };
@@ -22,8 +23,8 @@ const useStore = create<Store>()(
             messages: s.messages.concat(message),
           })),
         updateMessage: (id: string, newMessage: Partial<PeerChatMessage>) =>
-          set((state) => ({
-            messages: state.messages.map((message) =>
+          set((s) => ({
+            messages: s.messages.map((message) =>
               message.id === id
                 ? {
                     ...message,
@@ -46,6 +47,8 @@ const useStore = create<Store>()(
               user.id === id ? { ...user, ...newUser } : user
             ),
           })),
+        updateIsSendingFile: (isSendingFile: boolean) =>
+          set(() => ({ isSendingFile })),
       },
     }),
     {
@@ -58,3 +61,4 @@ const useStore = create<Store>()(
 export const useStoreActions = () => useStore((state) => state.actions);
 export const useMessages = () => useStore((state) => state.messages);
 export const useUsers = () => useStore((state) => state.users);
+export const useIsSendingFile = () => useStore((state) => state.isSendingFile);

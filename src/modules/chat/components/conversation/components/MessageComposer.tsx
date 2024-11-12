@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FileAddOutlined } from "@ant-design/icons";
 import { useRTCPeerConnectionContextValue } from "@common/hooks/useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "@common/hooks/useSocketIOContextValue";
-import { useStoreActions } from "@common/store";
+import { useIsSendingFile, useStoreActions } from "@common/store";
 import { getDataDownloadUrl } from "@common/utils/files";
 import {
   transformDataChannelFileMessagesToPeerChatMessage,
@@ -23,9 +23,10 @@ function MessageComposer() {
   const [message, setMessage] = useState("");
   const [fileList, setFileList] = useState<RcFile[]>([]);
 
-  const { addMessage, updateMessage } = useStoreActions();
+  const { addMessage, updateMessage, updateIsSendingFile } = useStoreActions();
   const { dataChannelRef } = useRTCPeerConnectionContextValue();
   const { client: socketIOClient } = useSocketIoClientContextValue();
+  const isSendingFile = useIsSendingFile();
 
   const sendFileToPeer = () => {
     const dataChannel = dataChannelRef.current;
@@ -58,7 +59,8 @@ function MessageComposer() {
           socketIOClient!
         )
       );
-
+      setFileList([])
+      updateIsSendingFile(true);
       // Set up file reading
       const reader = new FileReader();
       let offset = 0;
@@ -103,20 +105,28 @@ function MessageComposer() {
           dataChannel.send(JSON.stringify(completeMessage));
           setFileList([]);
           console.log("File send complete");
-          const url = getDataDownloadUrl(file);
+          const url = getDataDownloadUrl(file, file.type);
           const updatedMessage = {
             fileData: { status: "complete", url } as PeerChatFileData,
           };
           updateMessage(fileId, updatedMessage);
+          updateIsSendingFile(false);
         }
       };
 
       reader.onerror = (error) => {
         // TODO: Show error notification
         console.error("Error reading file:", error);
-        dataChannel.send(
-          JSON.stringify({ action: "error", error: "File read error" })
-        );
+
+        const errorMessage: PeerChatDataChannelMessage = {
+          action: "error",
+          originatorId,
+          timestamp: Date.now(),
+          payload: {},
+        };
+
+        dataChannel.send(JSON.stringify(errorMessage));
+        updateIsSendingFile(false);
       };
 
       // Start the transfer
@@ -130,6 +140,7 @@ function MessageComposer() {
         payload: {},
       };
       dataChannel.send(JSON.stringify(errorMessage));
+      updateIsSendingFile(false);
     }
   };
 
@@ -182,6 +193,7 @@ function MessageComposer() {
         }}
       >
         <Upload
+          disabled={isSendingFile}
           maxCount={1}
           beforeUpload={(file) => {
             setFileList([file]);
