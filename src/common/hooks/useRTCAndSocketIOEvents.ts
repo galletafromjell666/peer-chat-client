@@ -119,16 +119,53 @@ export function useRTCAndSocketIOEvents() {
       // TODO: Add handlers
     };
 
+    const addMediaTracks = async () => {
+      console.log("trying to add mediatracks!!");
+      try {
+        // Request access to media devices
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+        console.log("Got media stream:", stream);
+
+        // Attach tracks to the peer connection
+        stream.getTracks().forEach((track) => {
+          console.log("Adding track:", track);
+          peerConnectionRef.current.addTrack(track, stream);
+        });
+
+        // TODO: Place it on a ref
+        // localVideo.srcObject = stream;
+      } catch (error) {
+        console.error("Error accessing media devices:", error);
+      }
+    };
+
     const startWebRTC = async (offerData = null, iceCandidates = []) => {
-      peerConnectionRef.current = await new RTCPeerConnection(
-        peerConfiguration
-      );
-      console.log(peerConnectionRef, dataChannelRef);
+      peerConnectionRef.current = new RTCPeerConnection(peerConfiguration);
+      // TODO: move to the caller?
       dataChannelRef.current =
         peerConnectionRef.current.createDataChannel("chat");
 
-      peerConnectionRef.current.ondatachannel = (e: RTCDataChannelEvent) => {
-        console.log("Callee has received a data channel event");
+      // Configure data channel events
+      dataChannelRef.current.onmessage = onChannelMessage;
+      dataChannelRef.current.onopen = onChannelOpen;
+      dataChannelRef.current.onclose = onChannelClose;
+      dataChannelRef.current.onerror = onChannelError;
+
+      peerConnectionRef.current.onnegotiationneeded = async (e) => {
+        console.warn("negotiation needed!!", e);
+        const offer = await peerConnectionRef.current.createOffer();
+        await peerConnectionRef.current.setLocalDescription(offer);
+        console.log("Sending new offer to signaling server", offer);
+
+        // Send 'webrtc-negotiation' event with the new offer
+        socketIOClient.send("negotiation", offer);
+      };
+
+      peerConnectionRef.current.ondatachannel = (e) => {
+        console.log("Data channel event received");
         const receiveChannel = e.channel;
         receiveChannel.onmessage = onChannelMessage;
         receiveChannel.onopen = onChannelOpen;
@@ -136,64 +173,77 @@ export function useRTCAndSocketIOEvents() {
         receiveChannel.onerror = onChannelError;
       };
 
-      // addLogs();
-
-      peerConnectionRef.current.addEventListener(
-        "icecandidate",
-        (e: RTCPeerConnectionIceEvent) => {
-          if (e.candidate) {
-            console.log(
-              "Sending ICE Candidate to signaling server",
-              e.candidate
-            );
-            socketIOClient.send("send-candidate-to-signaling", e.candidate);
-          }
+      peerConnectionRef.current.onicecandidate = (e) => {
+        if (e.candidate) {
+          console.log("Sending ICE candidate to signaling server", e.candidate);
+          socketIOClient.send("send-candidate-to-signaling", e.candidate);
         }
-      );
-
-      if (!offerData) {
-        /*
-        dataChannel.onopen = onChannelOpen;
-
-        dataChannel.onclose = onChannelClose;
-
-        dataChannel.onerror = onChannelError;
-
-        dataChannel.onmessage = onChannelMessage;
-         */
-
-        const offer = await peerConnectionRef.current.createOffer();
-        peerConnectionRef.current.setLocalDescription(offer);
-        console.log("Sending offer to signaling server", offer);
-        socketIOClient.send("new-offer", offer);
-      }
+      };
 
       if (offerData) {
-        console.log("Callee has received and offer");
-        // Callee
-
+        // If offer data is available, treat this as a callee and answer
+        console.log("Received offer, setting remote description");
         await peerConnectionRef.current.setRemoteDescription(offerData);
-        const answer = await peerConnectionRef.current.createAnswer();
-        peerConnectionRef.current.setLocalDescription(answer);
 
-        iceCandidates.map(async (c) => {
-          console.log("Adding init candidate", c);
+        const answer = await peerConnectionRef.current.createAnswer();
+        await peerConnectionRef.current.setLocalDescription(answer);
+
+        iceCandidates.forEach(async (c) => {
+          console.log("Adding ICE candidate", c);
           await peerConnectionRef.current.addIceCandidate(c);
         });
 
-        console.log("Callee is emitting an answer to signaling server");
-        socketIOClient.send("send-answer-to-signaling", answer);
+        console.log("Sending answer");
+        socketIOClient.send("negotiation", answer);
+      } else {
+        // Otherwise, initiate the offer
+        console.log("Creating and sending offer");
+        const offer = await peerConnectionRef.current.createOffer();
+        await peerConnectionRef.current.setLocalDescription(offer);
+        socketIOClient.send("negotiation", offer);
       }
-      return;
+
+      // addMediaTracks();
     };
 
-    // init
     const handleInitEvent = (data: any) => {
       console.log("Received init", data);
       startWebRTC(data?.offer, data?.iceCandidates);
     };
 
     socketIOClient.subscribe("init", handleInitEvent);
+
+    const handleNegotiation = async (data: RTCSessionDescriptionInit) => {
+      const peerConnection = peerConnectionRef.current;
+      const { type } = data;
+
+      if (type === "offer") {
+        console.log("received OFFER from signaling")
+        // Rollback if necessary before setting a new offer
+        if (peerConnection.signalingState !== "stable") {
+          console.log("Rollback before setting new offer");
+          await peerConnection.setLocalDescription({ type: "rollback" });
+        }
+
+        console.log("Setting received offer as remote description");
+        await peerConnection.setRemoteDescription(data);
+
+        // Create and send an answer
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        console.log("Sending answer to signaling server");
+        socketIOClient.send("negotiation", answer);
+      } else if (type === "answer") {
+        if (peerConnection.signalingState === "have-local-offer") {
+          console.log("received ANSWER from signaling")
+          await peerConnection.setRemoteDescription(data);
+        } else {
+          console.warn("Unexpected answer state, discarding.");
+        }
+      }
+    };
+
+    socketIOClient.on("negotiation", handleNegotiation);
 
     // receive candidate
     const handleReceiveCandidate = async (data: any) => {
@@ -212,11 +262,15 @@ export function useRTCAndSocketIOEvents() {
     socketIOClient.subscribe("receive-candidate", handleReceiveCandidate);
 
     // receive answer
-    const handleReceiveAnswer = (data: any) => {
-      console.log("caller has received an answer from signaling server");
-      peerConnectionRef.current.setRemoteDescription(data);
-    };
-    socketIOClient.subscribe("receive-answer", handleReceiveAnswer);
+    // const handleReceiveAnswer = async (data: any) => {
+    //    if (peerConnectionRef.current.signalingState === "have-local-offer") {
+    //       console.log("received ANSWER from signaling")
+    //       await peerConnectionRef.current.setRemoteDescription(data);
+    //     } else {
+    //       console.warn("Unexpected answer state, discarding.");
+    //     }
+    // };
+    // socketIOClient.subscribe("receive-answer", handleReceiveAnswer);
 
     return () => {
       console.log("unsubscribe!");
