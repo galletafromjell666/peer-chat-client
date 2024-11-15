@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
 	margin: 0;
 	padding: 0;
 	border: 0;
@@ -8,4 +9,39 @@ html, body {
 	overflow: hidden;
 	scrollbar-width: thin;
 	scrollbar-color: #d9d9d9 transparent;
+}
+
+/*
+TODO: FIX LATER
+*/
+video {
+	border-radius: 0.75rem;
+	width: 100%;
+	filter: brightness(100%);
+	height: fit-content;
+}
+
+video:hover {
+	filter: brightness(70%);
+	transition: all 1s ease;
+
+}
+
+.video_container p {
+	position: absolute;
+	z-index: 20;
+	transform: translate(0.5rem, -0.5rem);
+}
+
+.big_frame {
+	width: 100%;
+}
+
+.small_frame {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: 33%;
+	transform: translate(-5%, -25%);
+	z-index: 10;
 }

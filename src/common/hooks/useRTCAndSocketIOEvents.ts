@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useCallback, useEffect, useRef } from "react";
 import { useStoreActions } from "@common/store";
 import { getDataDownloadUrl } from "@common/utils/files";
 import {
@@ -10,6 +11,7 @@ import {
   PeerChatFileData,
 } from "@peer-chat-types/index";
 
+import { updateMediaStreams } from "./useMediaStreamStore";
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 
@@ -32,46 +34,47 @@ export function useRTCAndSocketIOEvents() {
   const chunks = useRef<any>([]);
   const receivedSize = useRef<any>(0);
 
-  const handleMessageChannelMessage = (
-    RTCMessage: PeerChatDataChannelMessage
-  ) => {
-    console.log("message!", RTCMessage);
-    const { action, payload } = RTCMessage;
-    if (action === "message") {
-      // this event has a message in its payload!
-      const peerChatMessage = transformDataChannelMessageToPeerChatMessage(
-        RTCMessage,
-        socketIOClient!
-      );
-      console.log("adding message to store", peerChatMessage);
-      addMessage(peerChatMessage);
-    } else if (action === "start") {
-      inComingFile.current = payload;
-      const peerChatMessageWithFile =
-        transformDataChannelFileMessagesToPeerChatMessage(
+  const handleMessageChannelMessage = useCallback(
+    (RTCMessage: PeerChatDataChannelMessage) => {
+      console.log("message!", RTCMessage);
+      const { action, payload } = RTCMessage;
+      if (action === "message") {
+        // this event has a message in its payload!
+        const peerChatMessage = transformDataChannelMessageToPeerChatMessage(
           RTCMessage,
           socketIOClient!
         );
-      addMessage(peerChatMessageWithFile);
-    } else if (action === "complete") {
-      const fileId = payload.id;
-      const fileData = new Uint8Array(receivedSize.current);
-      let offset = 0;
-      for (const chunk of chunks.current) {
-        fileData.set(new Uint8Array(chunk), offset);
-        offset += chunk.byteLength;
+        console.log("adding message to store", peerChatMessage);
+        addMessage(peerChatMessage);
+      } else if (action === "start") {
+        inComingFile.current = payload;
+        const peerChatMessageWithFile =
+          transformDataChannelFileMessagesToPeerChatMessage(
+            RTCMessage,
+            socketIOClient!
+          );
+        addMessage(peerChatMessageWithFile);
+      } else if (action === "complete") {
+        const fileId = payload.id;
+        const fileData = new Uint8Array(receivedSize.current);
+        let offset = 0;
+        for (const chunk of chunks.current) {
+          fileData.set(new Uint8Array(chunk), offset);
+          offset += chunk.byteLength;
+        }
+
+        const url = getDataDownloadUrl(fileData, inComingFile.current.type);
+
+        const updatedMessageWithUrl = {
+          fileData: { url, status: "complete" } as PeerChatFileData,
+        };
+        console.log("message with url", updatedMessageWithUrl);
+
+        updateMessage(fileId, updatedMessageWithUrl);
       }
-
-      const url = getDataDownloadUrl(fileData, inComingFile.current.type);
-
-      const updatedMessageWithUrl = {
-        fileData: { url, status: "complete" } as PeerChatFileData,
-      };
-      console.log("message with url", updatedMessageWithUrl);
-
-      updateMessage(fileId, updatedMessageWithUrl);
-    }
-  };
+    },
+    [addMessage, socketIOClient, updateMessage]
+  );
 
   useEffect(() => {
     if (!socketIOClient) return;
@@ -120,6 +123,32 @@ export function useRTCAndSocketIOEvents() {
       // TODO: Add handlers
     };
 
+    const onTrack = (e: RTCTrackEvent) => {
+      if (e.streams) {
+        console.log("Received media stream:", e);
+        updateMediaStreams({ incoming: e.streams[0] });
+      }
+    };
+
+    const onIceCandidate = (e: RTCPeerConnectionIceEvent) => {
+      if (e.candidate) {
+        console.log("Sending ICE candidate to signaling server", e.candidate);
+        socketIOClient.send("send-candidate-to-signaling", e.candidate);
+      }
+    };
+
+    const onNegotiationNeeded = async () => {
+      console.warn("Negotiation is needed");
+      // Sets the appropriate description based on the current signalingState
+      await peerConnectionRef.current.setLocalDescription();
+      // Send 'negotiation' event with the new offer
+      console.log("sending negotiation to signaling (offer i guess)");
+      socketIOClient.send(
+        "negotiation",
+        peerConnectionRef.current.localDescription
+      );
+    };
+
     // 1. We receive init! it has data, like if we are polite :)
     const handleInitEvent = (data: any) => {
       console.log(
@@ -127,6 +156,7 @@ export function useRTCAndSocketIOEvents() {
         data
       );
       isPoliteRef.current = data.isPolite;
+
       peerConnectionRef.current = new RTCPeerConnection(peerConfiguration);
       // TODO: move to the caller?
       dataChannelRef.current =
@@ -147,24 +177,11 @@ export function useRTCAndSocketIOEvents() {
         receiveChannel.onerror = onChannelError;
       };
 
-      peerConnectionRef.current.onnegotiationneeded = async (e) => {
-        console.warn("Negotiation is needed", e);
-        // Sets the appropriate description based on the current signalingState
-        await peerConnectionRef.current.setLocalDescription();
-        // Send 'negotiation' event with the new offer
-        console.log("sending negotiation to signaling (offer i guess)");
-        socketIOClient.send(
-          "negotiation",
-          peerConnectionRef.current.localDescription
-        );
-      };
+      peerConnectionRef.current.ontrack = onTrack;
 
-      peerConnectionRef.current.onicecandidate = (e) => {
-        if (e.candidate) {
-          console.log("Sending ICE candidate to signaling server", e.candidate);
-          socketIOClient.send("send-candidate-to-signaling", e.candidate);
-        }
-      };
+      peerConnectionRef.current.onnegotiationneeded = onNegotiationNeeded;
+
+      peerConnectionRef.current.onicecandidate = onIceCandidate;
     };
 
     socketIOClient.subscribe("init", handleInitEvent);
@@ -213,31 +230,13 @@ export function useRTCAndSocketIOEvents() {
 
     socketIOClient.subscribe("receive-candidate", handleReceiveCandidate);
 
-    const addMediaTracks = async () => {
-      console.log("trying to add media tracks!!");
-      try {
-        // Request access to media devices
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true,
-        });
-        console.log("Got media stream:", stream);
-
-        // Attach tracks to the peer connection
-        stream.getTracks().forEach((track) => {
-          console.log("Adding track:", track);
-          peerConnectionRef.current.addTrack(track, stream);
-        });
-
-        // TODO: Place it on a ref
-        // localVideo.srcObject = stream;
-      } catch (error) {
-        console.error("Error accessing media devices:", error);
-      }
-    };
-
     return () => {
       console.log("useRTCAndSocketIOEvents clean up");
     };
-  }, [socketIOClient]);
+  }, [
+    dataChannelRef,
+    handleMessageChannelMessage,
+    peerConnectionRef,
+    socketIOClient,
+  ]);
 }
