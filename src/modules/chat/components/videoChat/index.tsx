@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import {
   useIncomingMediaStream,
   useOutgoingMediaStream,
@@ -19,49 +18,61 @@ function VideoChat() {
   const incomingMediaStream = useIncomingMediaStream();
   const outgoingMediaStream = useOutgoingMediaStream();
 
-  const RenderComponent = useMemo(() => {
-    if (incomingMediaStream && !outgoingMediaStream) {
-      // Only incoming video!
-      return (
+  console.log({ incomingMediaStream, outgoingMediaStream });
+
+  let RenderComponent = null;
+  if (
+    incomingMediaStream &&
+    incomingMediaStream.active &&
+    !outgoingMediaStream
+  ) {
+    // Only incoming video!
+    RenderComponent = (
+      <VideoPlayer
+        label={defaultLabels.incoming}
+        isBigFrame
+        stream={incomingMediaStream}
+      />
+    );
+  }
+
+  if (
+    outgoingMediaStream &&
+    outgoingMediaStream.active &&
+    !incomingMediaStream
+  ) {
+    // Only outgoing video!
+    RenderComponent = (
+      <VideoPlayer
+        label={defaultLabels.outgoing}
+        isBigFrame
+        stream={outgoingMediaStream}
+      />
+    );
+  }
+
+  if (
+    incomingMediaStream &&
+    incomingMediaStream.active &&
+    outgoingMediaStream &&
+    outgoingMediaStream.active
+  ) {
+    // Both videos!, applying the big frame to the incoming
+    RenderComponent = (
+      <>
+        <VideoPlayer
+          label={defaultLabels.outgoing}
+          isBigFrame={false}
+          stream={outgoingMediaStream}
+        />
         <VideoPlayer
           label={defaultLabels.incoming}
           isBigFrame
           stream={incomingMediaStream}
         />
-      );
-    }
-
-    if (outgoingMediaStream && !incomingMediaStream) {
-      // Only outgoing video!
-      return (
-        <VideoPlayer
-          label={defaultLabels.outgoing}
-          isBigFrame
-          stream={outgoingMediaStream}
-        />
-      );
-    }
-
-    if (incomingMediaStream && outgoingMediaStream) {
-      // Both videos!, applying the big frame to the incoming
-      return (
-        <>
-          <VideoPlayer
-            label={defaultLabels.outgoing}
-            isBigFrame={false}
-            stream={outgoingMediaStream}
-          />
-          <VideoPlayer
-            label={defaultLabels.incoming}
-            isBigFrame
-            stream={incomingMediaStream}
-          />
-        </>
-      );
-    }
-
-    return null;
-  }, [incomingMediaStream, outgoingMediaStream]);
+      </>
+    );
+  }
 
   if (!RenderComponent) return null;
 
@@ -77,9 +88,12 @@ function VideoChat() {
       }}
     >
       <Flex
-      style={{
-        position: "relative"
-      }}>{RenderComponent}</Flex>
+        style={{
+          position: "relative",
+        }}
+      >
+        {RenderComponent}
+      </Flex>
       <Controls />
     </Flex>
   );

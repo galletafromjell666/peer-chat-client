@@ -5,12 +5,12 @@ let outgoingMediaStream: MediaStream | null = null;
 
 const listeners = new Set();
 
-function setIncomingMediaStream(stream: MediaStream) {
+function setIncomingMediaStream(stream: MediaStream | null) {
   incomingMediaStream = stream;
   notifyListeners();
 }
 
-function setOutgoingMediaStream(stream: MediaStream) {
+function setOutgoingMediaStream(stream: MediaStream | null) {
   outgoingMediaStream = stream;
   notifyListeners();
 }
@@ -39,6 +39,6 @@ export function updateMediaStreams({
   incoming?: MediaStream | null;
   outgoing?: MediaStream | null;
 }) {
-  if (incoming) setIncomingMediaStream(incoming);
-  if (outgoing) setOutgoingMediaStream(outgoing);
+  if (incoming !== undefined) setIncomingMediaStream(incoming);
+  if (outgoing !== undefined) setOutgoingMediaStream(outgoing);
 }
