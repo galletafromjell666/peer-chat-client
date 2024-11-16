@@ -4,6 +4,8 @@ import { useSocketIOConfigActions } from "@common/hooks/useSocketIOConfigActions
 import { useSocketIoClientContextValue } from "@common/hooks/useSocketIOContextValue";
 import { Flex, theme } from "antd";
 
+import VideoChat from "../videoChat";
+
 import Header from "./components/Header";
 import MessageComposer from "./components/MessageComposer";
 import MessageHistory from "./components/MessageHistory";
@@ -32,17 +34,18 @@ function Conversation() {
 
   return (
     <Flex
-      vertical
-      align="center"
       style={{
         backgroundColor: token.colorPrimaryBg,
         width: "100dvw",
         height: "100dvh",
       }}
     >
-      <Header />
-      <MessageHistory />
-      <MessageComposer />
+      <VideoChat />
+      <Flex vertical align="center" flex={1}>
+        <Header />
+        <MessageHistory />
+        <MessageComposer />
+      </Flex>
     </Flex>
   );
 }

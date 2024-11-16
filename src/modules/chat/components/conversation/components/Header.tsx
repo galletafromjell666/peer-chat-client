@@ -1,10 +1,12 @@
-import { AudioOutlined, VideoCameraOutlined } from "@ant-design/icons";
-import { Button, Flex, Space, theme,Typography } from "antd";
+import { VideoCameraOutlined } from "@ant-design/icons";
+import useMediaStreamActions from "@common/hooks/useMediaStreamActions";
+import { Button, Flex, Space, theme, Typography } from "antd";
 
 const { useToken } = theme;
 const { Text } = Typography;
 
 function Header() {
+  const { addMediaTracksToRTCConnection } = useMediaStreamActions();
   const { token } = useToken();
   return (
     <Flex
@@ -30,8 +32,11 @@ function Header() {
       >
         <Text>This is a chat</Text>
         <Space>
-          <Button shape="circle" icon={<VideoCameraOutlined />} />
-          <Button shape="circle" icon={<AudioOutlined />} />
+          <Button
+            onClick={addMediaTracksToRTCConnection}
+            shape="circle"
+            icon={<VideoCameraOutlined />}
+          />
         </Space>
       </Flex>
     </Flex>
