@@ -44,6 +44,7 @@ function VideoChat() {
     // Only outgoing video!
     RenderComponent = (
       <VideoPlayer
+        muted
         label={defaultLabels.outgoing}
         isBigFrame
         stream={outgoingMediaStream}
@@ -61,6 +62,7 @@ function VideoChat() {
     RenderComponent = (
       <>
         <VideoPlayer
+          muted
           label={defaultLabels.outgoing}
           isBigFrame={false}
           stream={outgoingMediaStream}
@@ -81,6 +83,9 @@ function VideoChat() {
       style={{
         alignItems: "center",
         width: "60%",
+        flexDirection: "column",
+        justifyContent: "center",
+        gap: "1rem",
         height: "100%",
         padding: "0.75rem",
         borderColor: token.colorBorder,
@@ -88,7 +93,9 @@ function VideoChat() {
       }}
     >
       <Flex
+        vertical
         style={{
+          gap: "1rem",
           position: "relative",
         }}
       >

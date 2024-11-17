@@ -22,12 +22,14 @@ video {
 }
 
 video:hover {
-	filter: brightness(70%);
+	filter: brightness(60%);
 	transition: all 1s ease;
 
 }
 
 .video_container p {
+	background-color: white;
+	padding: 0.25rem;
 	position: absolute;
 	z-index: 20;
 	transform: translate(0.5rem, -0.5rem);
@@ -42,6 +44,6 @@ video:hover {
 	right: 0;
 	bottom: 0;
 	width: 33%;
-	transform: translate(-5%, -25%);
+	transform: translate(-10%, -10%);
 	z-index: 10;
 }

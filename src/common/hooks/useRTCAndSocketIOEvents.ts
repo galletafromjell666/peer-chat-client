@@ -243,6 +243,12 @@ export function useRTCAndSocketIOEvents() {
 
     return () => {
       console.log("useRTCAndSocketIOEvents clean up");
+      const peerConnection = peerConnectionRef.current;
+    if(!peerConnection) return
+      const dataChannel = dataChannelRef.current;
+      peerConnection.close();
+      dataChannel?.close();
+      socketIOClient.disconnect();
     };
   }, [
     dataChannelRef,

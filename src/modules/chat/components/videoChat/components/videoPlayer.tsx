@@ -4,8 +4,9 @@ interface VideoPlayerProps {
   isBigFrame: boolean;
   stream: MediaStream;
   label: string;
+  muted?: boolean;
 }
-function VideoPlayer({ label, stream, isBigFrame }: VideoPlayerProps) {
+function VideoPlayer({ label, stream, isBigFrame, muted }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -20,6 +21,7 @@ function VideoPlayer({ label, stream, isBigFrame }: VideoPlayerProps) {
     >
       <p>{label}</p>
       <video
+        muted={!!muted}
         autoPlay
         playsInline
         ref={videoRef}

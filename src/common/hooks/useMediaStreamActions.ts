@@ -1,10 +1,27 @@
+import { useStoreActions } from "@common/store";
+
 import { updateMediaStreams } from "./useMediaStreamStore";
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
 
 function useMediaStreamActions() {
   const { peerConnectionRef } = useRTCPeerConnectionContextValue();
+  const { updatePreferredAudioInput, updatePreferredVideoInput } =
+    useStoreActions();
 
-  const addMediaTracksToRTCConnection = async () => {
+  const updatePreferredKindDevice = (
+    kind: "audio" | "video" | string,
+    deviceId: string
+  ) => {
+    if (kind === "audio") {
+      updatePreferredAudioInput(deviceId);
+      return;
+    }
+    if (kind === "video") {
+      updatePreferredVideoInput(deviceId);
+    }
+  };
+
+  const addMediaStreamToRTCConnection = async () => {
     const peerConnection = peerConnectionRef.current;
 
     if (!peerConnection) {
@@ -24,15 +41,20 @@ function useMediaStreamActions() {
       stream.getTracks().forEach((track) => {
         console.log("Adding track to peer connection:", track);
         peerConnection.addTrack(track, stream);
+        updatePreferredKindDevice(
+          track.kind,
+          track.getCapabilities().deviceId!
+        );
       });
 
       updateMediaStreams({ outgoing: stream });
     } catch (error) {
       console.error("Error accessing media devices:", error);
+      return { status: "error" };
     }
   };
 
-  const removeMediaTracksToRTCConnection = () => {
+  const removeMediaStreamToRTCConnection = () => {
     const peerConnection = peerConnectionRef.current;
 
     if (!peerConnection) {
@@ -55,7 +77,55 @@ function useMediaStreamActions() {
     updateMediaStreams({ outgoing: null });
   };
 
-  return { addMediaTracksToRTCConnection, removeMediaTracksToRTCConnection };
+  const updateMediaStreamTrackEnableValue = (
+    kind: "audio" | "video",
+    value: boolean
+  ) => {
+    const peerConnection = peerConnectionRef.current;
+    const senders = peerConnection.getSenders();
+
+    senders.forEach((sender) => {
+      if (sender.track && sender.track.kind === kind) {
+        console.log("changing track", sender.track, " enabled to ", value);
+        sender.track.enabled = value;
+      }
+    });
+  };
+
+  const replaceTrackFromMediaStream = async (
+    kind: "audio" | "video",
+    deviceId: boolean
+  ) => {
+    const peerConnection = peerConnectionRef.current;
+
+    const constraints =
+      kind === "video"
+        ? { video: { deviceId: { exact: deviceId } } }
+        : { audio: { deviceId: { exact: deviceId } } };
+
+    const newStream = await navigator.mediaDevices.getUserMedia(
+      constraints as unknown as MediaStreamConstraints
+    );
+
+    const newTrack =
+      kind === "video"
+        ? newStream.getVideoTracks()[0]
+        : newStream.getAudioTracks()[0];
+
+    const sender = peerConnection
+      .getSenders()
+      .find((s) => s.track && s.track.kind === kind);
+
+    await sender!.replaceTrack(newTrack);
+    // update zustand ??
+  };
+
+  return {
+    addMediaStreamToRTCConnection,
+    removeMediaStreamToRTCConnection,
+    updateMediaStreamTrackEnableValue,
+    replaceTrackFromMediaStream,
+  };
 }
 
 export default useMediaStreamActions;

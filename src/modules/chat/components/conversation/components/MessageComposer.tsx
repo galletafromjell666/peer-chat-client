@@ -174,7 +174,6 @@ function MessageComposer() {
     sendMessageToPeer();
   };
 
-  console.log("files", fileList);
   const hasFileUploaded = fileList.length > 0;
 
   return (
