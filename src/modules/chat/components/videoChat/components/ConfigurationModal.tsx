@@ -4,11 +4,13 @@ import {
   usePreferredAudioInput,
   usePreferredAudioOutput,
   usePreferredVideoInput,
+  useStoreActions,
 } from "@common/store";
-import { Flex, Modal, Select, Typography } from "antd";
+import { Flex, Modal, notification, Select, Typography } from "antd";
 import { isEmpty } from "lodash";
 
 const { Text } = Typography;
+const { useNotification } = notification;
 
 interface ConfigurationModalProps {
   isOpen: boolean;
@@ -28,10 +30,16 @@ const initialMediaDevicesMap: MediaDevicesMap = {
 };
 
 function ConfigurationModal({ isOpen, closeModal }: ConfigurationModalProps) {
+  const [msg, contextHolder] = useNotification();
   const { replaceTrackFromMediaStream } = useMediaStreamActions();
+  const { updatePreferredAudioOutput } = useStoreActions();
+
   const [inputChanges, setInputChanges] = useState<
     { kind: "audio" | "video"; id: string }[]
   >([]);
+
+  const [outputChanges, setOutputChanges] = useState<string[]>([]);
+
   const [devices, setDevices] = useState<MediaDevicesMap>(
     initialMediaDevicesMap
   );
@@ -65,14 +73,31 @@ function ConfigurationModal({ isOpen, closeModal }: ConfigurationModalProps) {
   }, []);
 
   const handleOk = async () => {
-    console.log("Applying input changes: ", inputChanges);
-    inputChanges.forEach(async ({ kind, id }) => {
-      await replaceTrackFromMediaStream(kind, id);
+    if (!isEmpty(inputChanges)) {
+      console.log("Applying input changes: ", inputChanges);
+      inputChanges.forEach(async ({ kind, id }) => {
+        await replaceTrackFromMediaStream(kind, id);
+      });
+      setInputChanges([]);
+    }
+    if (!isEmpty(outputChanges)) {
+      console.log("Applying output changes: ", inputChanges);
+      updatePreferredAudioOutput(outputChanges[0]);
+      setOutputChanges([]);
+    }
+    msg.success({
+      message: "Settings Updated Successfully",
+      description:
+        "Your device settings have been updated and saved successfully",
+      duration: 3,
+      showProgress: true,
     });
   };
 
   const handleCancel = () => {
     closeModal();
+    setInputChanges([]);
+    setOutputChanges([]);
   };
 
   const handleAudioInputDeviceChange = (value: string) => {
@@ -86,7 +111,7 @@ function ConfigurationModal({ isOpen, closeModal }: ConfigurationModalProps) {
   };
 
   const handleAudioOutputDeviceChange = (value: string) => {
-    console.log(value);
+    setOutputChanges([value]);
   };
 
   const handleVideoInputDeviceChange = (value: string) => {
@@ -99,67 +124,72 @@ function ConfigurationModal({ isOpen, closeModal }: ConfigurationModalProps) {
     });
   };
 
-  console.log(devices);
-
+  const isFormEmpty = isEmpty(inputChanges) && isEmpty(outputChanges);
   return (
-    <Modal
-      destroyOnClose
-      title="Media Devices Configuration"
-      open={isOpen}
-      onOk={handleOk}
-      onCancel={handleCancel}
-    >
-      <Flex vertical style={{ gap: "0.5rem" }}>
-        {!isEmpty(devices.audioinput) && (
-          <Flex vertical>
-            <Text type="secondary">Audio input device:</Text>
-            <Select
-              data-test-id="audio-input"
-              defaultValue={
-                preferredAudioInput || devices.audioinput[0].deviceId
-              }
-              style={{ width: "100%" }}
-              onChange={handleAudioInputDeviceChange}
-              options={devices.audioinput.map((device) => {
-                return { value: device.deviceId, label: device.label };
-              })}
-            />
-          </Flex>
-        )}
-        {!isEmpty(devices.audiooutput) && (
-          <Flex vertical>
-            <Text type="secondary">Audio output device:</Text>
-            <Select
-              data-test-id="audio-input"
-              defaultValue={
-                preferredAudioOutput || devices.audiooutput[0].deviceId
-              }
-              style={{ width: "100%" }}
-              onChange={handleAudioOutputDeviceChange}
-              options={devices.audiooutput.map((device) => {
-                return { value: device.deviceId, label: device.label };
-              })}
-            />
-          </Flex>
-        )}
-        {!isEmpty(devices.videoinput) && (
-          <Flex vertical>
-            <Text type="secondary">Video input device:</Text>
-            <Select
-              data-test-id="audio-input"
-              defaultValue={
-                preferredVideoInput || devices.videoinput[0].deviceId
-              }
-              style={{ width: "100%" }}
-              onChange={handleVideoInputDeviceChange}
-              options={devices.videoinput.map((device) => {
-                return { value: device.deviceId, label: device.label };
-              })}
-            />
-          </Flex>
-        )}
-      </Flex>
-    </Modal>
+    <>
+      {contextHolder}
+      <Modal
+        destroyOnClose
+        title="Media Devices Configuration"
+        open={isOpen}
+        onOk={handleOk}
+        okText="Confirm"
+        okButtonProps={{ disabled: isFormEmpty }}
+        onCancel={handleCancel}
+        onClose={handleCancel}
+      >
+        <Flex vertical style={{ gap: "0.5rem" }}>
+          {!isEmpty(devices.audioinput) && (
+            <Flex vertical>
+              <Text type="secondary">Audio input device:</Text>
+              <Select
+                data-test-id="audio-input"
+                defaultValue={
+                  preferredAudioInput || devices.audioinput[0].deviceId
+                }
+                style={{ width: "100%" }}
+                onChange={handleAudioInputDeviceChange}
+                options={devices.audioinput.map((device) => {
+                  return { value: device.deviceId, label: device.label };
+                })}
+              />
+            </Flex>
+          )}
+          {!isEmpty(devices.audiooutput) && (
+            <Flex vertical>
+              <Text type="secondary">Audio output device:</Text>
+              <Select
+                data-test-id="audio-input"
+                defaultValue={
+                  preferredAudioOutput || devices.audiooutput[0].deviceId
+                }
+                style={{ width: "100%" }}
+                onChange={handleAudioOutputDeviceChange}
+                options={devices.audiooutput.map((device) => {
+                  return { value: device.deviceId, label: device.label };
+                })}
+              />
+            </Flex>
+          )}
+          {!isEmpty(devices.videoinput) && (
+            <Flex vertical>
+              <Text type="secondary">Video input device:</Text>
+              <Select
+                data-test-id="audio-input"
+                defaultValue={
+                  preferredVideoInput || devices.videoinput[0].deviceId
+                }
+                style={{ width: "100%" }}
+                onChange={handleVideoInputDeviceChange}
+                options={devices.videoinput.map((device) => {
+                  return { value: device.deviceId, label: device.label };
+                })}
+              />
+            </Flex>
+          )}
+        </Flex>
+      </Modal>
+    </>
   );
 }
 

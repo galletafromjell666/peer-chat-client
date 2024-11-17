@@ -5,8 +5,8 @@ import {
 import { Flex, theme } from "antd";
 const { useToken } = theme;
 
-import Controls from "./components/controls";
-import VideoPlayer from "./components/videoPlayer";
+import Controls from "./components/MediaControls";
+import VideoPlayer from "./components/VideoPlayer";
 
 const defaultLabels = {
   outgoing: "You",

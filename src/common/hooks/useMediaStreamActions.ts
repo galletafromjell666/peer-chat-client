@@ -1,9 +1,13 @@
 import { useStoreActions } from "@common/store";
 
-import { updateMediaStreams } from "./useMediaStreamStore";
+import {
+  updateMediaStreams,
+  useOutgoingMediaStream,
+} from "./useMediaStreamStore";
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
 
 function useMediaStreamActions() {
+  const outgoingMediaStream = useOutgoingMediaStream();
   const { peerConnectionRef } = useRTCPeerConnectionContextValue();
   const { updatePreferredAudioInput, updatePreferredVideoInput } =
     useStoreActions();
@@ -19,6 +23,12 @@ function useMediaStreamActions() {
     if (kind === "video") {
       updatePreferredVideoInput(deviceId);
     }
+  };
+
+  const getTrackByKind = (kind: "audio" | "video", stream: MediaStream) => {
+    return kind === "video"
+      ? stream.getVideoTracks()[0]
+      : stream.getAudioTracks()[0];
   };
 
   const addMediaStreamToRTCConnection = async () => {
@@ -97,7 +107,7 @@ function useMediaStreamActions() {
     deviceId: string
   ) => {
     const peerConnection = peerConnectionRef.current;
-    console.log(`Changing ${kind} track to use the ${deviceId}`)
+    console.log(`Changing ${kind} track to use the ${deviceId}`);
 
     const constraints =
       kind === "video"
@@ -108,17 +118,22 @@ function useMediaStreamActions() {
       constraints as unknown as MediaStreamConstraints
     );
 
-    const newTrack =
-      kind === "video"
-        ? newStream.getVideoTracks()[0]
-        : newStream.getAudioTracks()[0];
+    const newTrack = getTrackByKind(kind, newStream);
 
     const sender = peerConnection
       .getSenders()
       .find((s) => s.track && s.track.kind === kind);
 
+    // Replacing track on remote peer connection
     await sender!.replaceTrack(newTrack);
     updatePreferredKindDevice(kind, deviceId);
+    // Replacing track on local peer connection
+    const oldTrack = getTrackByKind(kind, outgoingMediaStream!);
+    oldTrack?.stop();
+    outgoingMediaStream?.removeTrack(oldTrack);
+    outgoingMediaStream?.addTrack(newTrack);
+
+    // updateMediaStreams({ outgoing: newStream });
   };
 
   return {

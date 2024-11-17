@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react";
+import { usePreferredAudioOutput } from "@common/store";
+import { isEmpty } from "lodash";
 
 interface VideoPlayerProps {
   isBigFrame: boolean;
@@ -7,6 +9,7 @@ interface VideoPlayerProps {
   muted?: boolean;
 }
 function VideoPlayer({ label, stream, isBigFrame, muted }: VideoPlayerProps) {
+  const preferredAudioOutput = usePreferredAudioOutput();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -14,6 +17,13 @@ function VideoPlayer({ label, stream, isBigFrame, muted }: VideoPlayerProps) {
       videoRef.current.srcObject = stream;
     }
   }, [stream]);
+
+  useEffect(() => {
+    if (muted || isEmpty(preferredAudioOutput) || isEmpty(videoRef?.current))
+      return;
+    console.log("Changing video audio output device: ", preferredAudioOutput);
+    videoRef.current.setSinkId(preferredAudioOutput);
+  }, [preferredAudioOutput, muted]);
 
   return (
     <div
