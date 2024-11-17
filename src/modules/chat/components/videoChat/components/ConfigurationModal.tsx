@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useMediaStreamActions from "@common/hooks/useMediaStreamActions";
 import {
   usePreferredAudioInput,
   usePreferredAudioOutput,
@@ -27,9 +28,15 @@ const initialMediaDevicesMap: MediaDevicesMap = {
 };
 
 function ConfigurationModal({ isOpen, closeModal }: ConfigurationModalProps) {
+  const { replaceTrackFromMediaStream } = useMediaStreamActions();
+  const [inputChanges, setInputChanges] = useState<
+    { kind: "audio" | "video"; id: string }[]
+  >([]);
   const [devices, setDevices] = useState<MediaDevicesMap>(
     initialMediaDevicesMap
   );
+
+  // TODO: refactor to react-hook-form!!
 
   const preferredAudioOutput = usePreferredAudioOutput();
   const preferredAudioInput = usePreferredAudioInput();
@@ -40,7 +47,7 @@ function ConfigurationModal({ isOpen, closeModal }: ConfigurationModalProps) {
       const navigatorDevices = await navigator.mediaDevices.enumerateDevices();
       const grouped = navigatorDevices.reduce<MediaDevicesMap>(
         (acc, device) => {
-            // Prevent duplicates
+          // Prevent duplicates
           if (acc[device.kind].some((d) => d.deviceId === device.deviceId)) {
             return acc;
           }
@@ -57,15 +64,46 @@ function ConfigurationModal({ isOpen, closeModal }: ConfigurationModalProps) {
     return () => {};
   }, []);
 
-  const handleOk = () => {};
+  const handleOk = async () => {
+    console.log("Applying input changes: ", inputChanges);
+    inputChanges.forEach(async ({ kind, id }) => {
+      await replaceTrackFromMediaStream(kind, id);
+    });
+  };
+
   const handleCancel = () => {
     closeModal();
+  };
+
+  const handleAudioInputDeviceChange = (value: string) => {
+    setInputChanges((c) => {
+      // Filter out all changes not related to "audio"
+      const filteredChanges = c.filter((ch) => ch.kind !== "audio");
+
+      // Add the new "audio" change
+      return [...filteredChanges, { kind: "audio", id: value }];
+    });
+  };
+
+  const handleAudioOutputDeviceChange = (value: string) => {
+    console.log(value);
+  };
+
+  const handleVideoInputDeviceChange = (value: string) => {
+    setInputChanges((c) => {
+      // Filter out all changes not related to "audio"
+      const filteredChanges = c.filter((ch) => ch.kind !== "video");
+
+      // Add the new "audio" change
+      return [...filteredChanges, { kind: "video", id: value }];
+    });
   };
 
   console.log(devices);
 
   return (
     <Modal
+      destroyOnClose
       title="Media Devices Configuration"
       open={isOpen}
       onOk={handleOk}
@@ -81,7 +119,7 @@ function ConfigurationModal({ isOpen, closeModal }: ConfigurationModalProps) {
                 preferredAudioInput || devices.audioinput[0].deviceId
               }
               style={{ width: "100%" }}
-              onChange={() => {}}
+              onChange={handleAudioInputDeviceChange}
               options={devices.audioinput.map((device) => {
                 return { value: device.deviceId, label: device.label };
               })}
@@ -97,7 +135,7 @@ function ConfigurationModal({ isOpen, closeModal }: ConfigurationModalProps) {
                 preferredAudioOutput || devices.audiooutput[0].deviceId
               }
               style={{ width: "100%" }}
-              onChange={() => {}}
+              onChange={handleAudioOutputDeviceChange}
               options={devices.audiooutput.map((device) => {
                 return { value: device.deviceId, label: device.label };
               })}
@@ -113,7 +151,7 @@ function ConfigurationModal({ isOpen, closeModal }: ConfigurationModalProps) {
                 preferredVideoInput || devices.videoinput[0].deviceId
               }
               style={{ width: "100%" }}
-              onChange={() => {}}
+              onChange={handleVideoInputDeviceChange}
               options={devices.videoinput.map((device) => {
                 return { value: device.deviceId, label: device.label };
               })}

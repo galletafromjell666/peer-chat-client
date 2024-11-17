@@ -5,7 +5,7 @@ import { mediaDevicesErrorAccessMessage } from "@common/utils/constants";
 import { Button, Flex,  notification } from "antd";
 import { isNil } from "lodash";
 
-import ConfigurationModal from "./configurationModal";
+import ConfigurationModal from "./ConfigurationModal";
 
 function Controls() {
   const [isMuted, setIsMuted] = useState(false);

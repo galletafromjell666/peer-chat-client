@@ -94,9 +94,10 @@ function useMediaStreamActions() {
 
   const replaceTrackFromMediaStream = async (
     kind: "audio" | "video",
-    deviceId: boolean
+    deviceId: string
   ) => {
     const peerConnection = peerConnectionRef.current;
+    console.log(`Changing ${kind} track to use the ${deviceId}`)
 
     const constraints =
       kind === "video"
@@ -117,7 +118,7 @@ function useMediaStreamActions() {
       .find((s) => s.track && s.track.kind === kind);
 
     await sender!.replaceTrack(newTrack);
-    // update zustand ??
+    updatePreferredKindDevice(kind, deviceId);
   };
 
   return {
