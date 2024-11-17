@@ -1,15 +1,18 @@
-import { VideoCameraOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import { InfoCircleOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import useMediaStreamActions from "@common/hooks/useMediaStreamActions";
 import { useOutgoingMediaStream } from "@common/hooks/useMediaStreamStore";
 import { mediaDevicesErrorAccessMessage } from "@common/utils/constants";
-import { Button, Flex, notification, Space, theme, Typography } from "antd";
+import { Button, Flex, notification, Space, theme } from "antd";
 import { isNil } from "lodash";
 
+import InformationModal from "./InformationModal";
+
 const { useToken } = theme;
-const { Text } = Typography;
 const { useNotification } = notification;
 
 function Header() {
+  const [isInformationModalOpen, setIsInformationModalOpen] = useState(false);
   const [msg, contextHolder] = useNotification();
   const outgoingMediaStream = useOutgoingMediaStream();
   const hasOutgoingStream = !isNil(outgoingMediaStream);
@@ -36,6 +39,7 @@ function Header() {
         justify="center"
         style={{
           width: "100%",
+          backgroundColor: token.colorBgContainerDisabled,
           borderBottomWidth: "0.125rem",
           borderBottomStyle: "solid",
           borderColor: token.colorBorder,
@@ -52,7 +56,15 @@ function Header() {
             maxWidth: "1450px",
           }}
         >
-          <Text>This is a chat</Text>
+          <Space>
+            <Button
+              onClick={() => setIsInformationModalOpen(true)}
+              iconPosition="end"
+              icon={<InfoCircleOutlined />}
+            >
+              63b5a9f3-000f-473a-8c83-4c1b62fc2f37
+            </Button>
+          </Space>
           <Space>
             <Button
               onClick={handleOutgoingStream}
@@ -62,6 +74,10 @@ function Header() {
           </Space>
         </Flex>
       </Flex>
+      <InformationModal
+        isOpen={isInformationModalOpen}
+        handleClose={() => setIsInformationModalOpen(false)}
+      />
     </>
   );
 }

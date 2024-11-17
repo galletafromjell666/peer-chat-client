@@ -12,14 +12,25 @@ import {
   PeerChatDataChannelMessage,
   PeerChatFileData,
 } from "@peer-chat-types/index";
-import { Button, Flex, Input, Space, Tag, Typography, Upload } from "antd";
+import {
+  Button,
+  Flex,
+  Input,
+  Space,
+  Tag,
+  theme,
+  Typography,
+  Upload,
+} from "antd";
 import { RcFile } from "antd/es/upload/interface";
 
 const { Text } = Typography;
+const { useToken } = theme;
 
 const CHUNK_SIZE = 16384;
 
 function MessageComposer() {
+  const { token } = useToken();
   const [message, setMessage] = useState("");
   const [fileList, setFileList] = useState<RcFile[]>([]);
 
@@ -59,7 +70,7 @@ function MessageComposer() {
           socketIOClient!
         )
       );
-      setFileList([])
+      setFileList([]);
       updateIsSendingFile(true);
       // Set up file reading
       const reader = new FileReader();
@@ -178,50 +189,55 @@ function MessageComposer() {
 
   return (
     <Flex
+      justify="center"
+      style={{ width: "100%", backgroundColor: token.colorBgContainerDisabled }}
       data-test-id="input-section"
-      style={{
-        width: "100%",
-        maxWidth: "1450px",
-      }}
     >
       <Flex
         style={{
-          padding: "0.65rem 0.5rem",
           width: "100%",
-          gap: "1rem",
+          maxWidth: "1450px",
         }}
       >
-        <Upload
-          disabled={isSendingFile}
-          maxCount={1}
-          beforeUpload={(file) => {
-            setFileList([file]);
-            return false;
+        <Flex
+          style={{
+            padding: "0.65rem 0.5rem",
+            width: "100%",
+            gap: "1rem",
           }}
-          fileList={fileList}
-          showUploadList={false}
         >
-          <Button shape="circle" icon={<FileAddOutlined />} />
-        </Upload>
-        <Space.Compact style={{ width: "100%", justifyContent: "end" }}>
-          {!hasFileUploaded ? (
-            <Input
-              onChange={(e) => {
-                setMessage(e.target.value);
-              }}
-              value={message}
-            />
-          ) : (
-            <div>
-              <Tag closable onClose={() => setFileList([])}>
-                <Text>{fileList[0].name}</Text>
-              </Tag>
-            </div>
-          )}
-          <Button type="primary" onClick={handleSubmit}>
-            Submit
-          </Button>
-        </Space.Compact>
+          <Upload
+            disabled={isSendingFile}
+            maxCount={1}
+            beforeUpload={(file) => {
+              setFileList([file]);
+              return false;
+            }}
+            fileList={fileList}
+            showUploadList={false}
+          >
+            <Button shape="circle" icon={<FileAddOutlined />} />
+          </Upload>
+          <Space.Compact style={{ width: "100%", justifyContent: "end" }}>
+            {!hasFileUploaded ? (
+              <Input
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                }}
+                value={message}
+              />
+            ) : (
+              <div>
+                <Tag closable onClose={() => setFileList([])}>
+                  <Text>{fileList[0].name}</Text>
+                </Tag>
+              </div>
+            )}
+            <Button type="primary" onClick={handleSubmit}>
+              Submit
+            </Button>
+          </Space.Compact>
+        </Flex>
       </Flex>
     </Flex>
   );
