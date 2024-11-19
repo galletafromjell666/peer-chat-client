@@ -1,3 +1,4 @@
+import { useStore } from "@common/store";
 import {
   PeerChatDataChannelMessage,
   PeerChatFileData,
@@ -54,4 +55,38 @@ export const transformDataChannelFileMessagesToPeerChatMessage = (
     timestamp,
   };
   return transformedMessage;
+};
+
+export const requestNotificationPermission = (
+  successCallback: () => void,
+  errorCallback?: () => void
+) => {
+  Notification.requestPermission()
+    .then((permission) => {
+      if (permission === "granted") {
+        successCallback();
+        return;
+      }
+      // Promise resolved but no as we want it.
+      errorCallback?.();
+    })
+    .catch((error) => {
+      console.log(
+        "Something wrong happened while enabling notifications",
+        error
+      );
+      errorCallback?.();
+    });
+};
+
+export const sendNewMessageNotification = () => {
+  const areNotificationsEnabled = useStore.getState().areNotificationsEnabled;
+  if (!areNotificationsEnabled) return;
+
+  const title = "New Message";
+  const options = {
+    body: "You have a new message from a peer connection",
+  };
+
+  new Notification(title, options);
 };

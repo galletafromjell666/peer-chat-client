@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { InfoCircleOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import useMediaStreamActions from "@common/hooks/useMediaStreamActions";
 import { useOutgoingMediaStream } from "@common/hooks/useMediaStreamStore";
@@ -12,12 +13,15 @@ const { useToken } = theme;
 const { useNotification } = notification;
 
 function Header() {
-  const [isInformationModalOpen, setIsInformationModalOpen] = useState(false);
+  const params = useParams();
+  const { token } = useToken();
   const [msg, contextHolder] = useNotification();
   const outgoingMediaStream = useOutgoingMediaStream();
-  const hasOutgoingStream = !isNil(outgoingMediaStream);
   const { addMediaStreamToRTCConnection, removeMediaStreamToRTCConnection } =
     useMediaStreamActions();
+
+  const [isInformationModalOpen, setIsInformationModalOpen] = useState(false);
+  const hasOutgoingStream = !isNil(outgoingMediaStream);
 
   const handleOutgoingStream = async () => {
     if (hasOutgoingStream) {
@@ -30,7 +34,9 @@ function Header() {
       msg.error(mediaDevicesErrorAccessMessage);
     }
   };
-  const { token } = useToken();
+
+  const chatId = params.chatId;
+
   return (
     <>
       {contextHolder}
@@ -62,7 +68,7 @@ function Header() {
               iconPosition="end"
               icon={<InfoCircleOutlined />}
             >
-              63b5a9f3-000f-473a-8c83-4c1b62fc2f37
+              {chatId}
             </Button>
           </Space>
           <Space>

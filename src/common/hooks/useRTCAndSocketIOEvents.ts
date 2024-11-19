@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useStoreActions } from "@common/store";
 import { getDataDownloadUrl } from "@common/utils/files";
 import {
+  sendNewMessageNotification,
   transformDataChannelFileMessagesToPeerChatMessage,
   transformDataChannelMessageToPeerChatMessage,
 } from "@common/utils/messaging";
@@ -46,6 +47,7 @@ export function useRTCAndSocketIOEvents() {
         );
         console.log("adding message to store", peerChatMessage);
         addMessage(peerChatMessage);
+        sendNewMessageNotification();
       } else if (action === "start") {
         inComingFile.current = payload;
         const peerChatMessageWithFile =
@@ -71,6 +73,7 @@ export function useRTCAndSocketIOEvents() {
         console.log("message with url", updatedMessageWithUrl);
 
         updateMessage(fileId, updatedMessageWithUrl);
+        sendNewMessageNotification();
       }
     },
     [addMessage, socketIOClient, updateMessage]
@@ -244,7 +247,7 @@ export function useRTCAndSocketIOEvents() {
     return () => {
       console.log("useRTCAndSocketIOEvents clean up");
       const peerConnection = peerConnectionRef.current;
-    if(!peerConnection) return
+      if (!peerConnection) return;
       const dataChannel = dataChannelRef.current;
       peerConnection.close();
       dataChannel?.close();

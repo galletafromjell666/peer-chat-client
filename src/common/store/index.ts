@@ -8,6 +8,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 const initialState: AppState = {
+  areNotificationsEnabled: false,
   preferredAudioInput: "",
   preferredVideoInput: "",
   preferredAudioOutput: "",
@@ -16,7 +17,7 @@ const initialState: AppState = {
   users: [],
 };
 
-const useStore = create<Store>()(
+export const useStore = create<Store>()(
   devtools(
     (set) => ({
       ...initialState,
@@ -58,6 +59,10 @@ const useStore = create<Store>()(
           set(() => ({ preferredAudioOutput })),
         updatePreferredVideoInput: (preferredVideoInput: string) =>
           set(() => ({ preferredVideoInput })),
+        toggleNotifications: () =>
+          set((state) => ({
+            areNotificationsEnabled: !state.areNotificationsEnabled,
+          })),
       },
     }),
     {
@@ -71,6 +76,7 @@ export const useStoreActions = () => useStore((state) => state.actions);
 
 export const useMessages = () => useStore((state) => state.messages);
 export const useUsers = () => useStore((state) => state.users);
+export const useAreNotificationsEnabled = () => useStore((state) => state.areNotificationsEnabled);
 export const useIsSendingFile = () => useStore((state) => state.isSendingFile);
 export const usePreferredAudioOutput = () =>
   useStore((state) => state.preferredAudioOutput);

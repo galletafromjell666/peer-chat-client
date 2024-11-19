@@ -3,10 +3,10 @@ import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 export function useSocketIOConfigActions() {
   const { setConfig } = useSocketIoClientContextValue();
 
-  const joinRoom = () => {
+  const joinRoom = (roomId: string) => {
     setConfig({
       query: {
-        roomId: "11",
+        roomId,
       },
     });
   };

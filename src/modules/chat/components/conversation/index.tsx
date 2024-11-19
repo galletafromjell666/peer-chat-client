@@ -20,13 +20,14 @@ function Conversation() {
   const socketIOActions = useSocketIOConfigActions();
 
   useEffect(() => {
-    console.log("Mounting conversation component, chat id", params?.chatId);
+    const chatId = params?.chatId;
+    console.log("Mounting conversation component, chat id : ", chatId);
     console.log(params?.chatId, socketIOClient);
     if (!socketIOClient) {
       console.log(
         "Empty socketIOClient, this means the user is joining a chat!!"
       );
-      socketIOActions.joinRoom();
+      socketIOActions.joinRoom(chatId!);
     }
 
     return () => {};

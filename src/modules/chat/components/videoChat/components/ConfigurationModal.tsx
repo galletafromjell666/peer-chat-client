@@ -92,6 +92,7 @@ function ConfigurationModal({ isOpen, closeModal }: ConfigurationModalProps) {
       duration: 3,
       showProgress: true,
     });
+    closeModal()
   };
 
   const handleCancel = () => {

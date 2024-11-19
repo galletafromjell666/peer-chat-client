@@ -1,8 +1,15 @@
 import { useState } from "react";
+import {
+  AudioMutedOutlined,
+  AudioOutlined,
+  ToolOutlined,
+  VideoCameraAddOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
 import useMediaStreamActions from "@common/hooks/useMediaStreamActions";
 import { useOutgoingMediaStream } from "@common/hooks/useMediaStreamStore";
 import { mediaDevicesErrorAccessMessage } from "@common/utils/constants";
-import { Button, Flex,  notification } from "antd";
+import { Button, Flex, notification, Tooltip } from "antd";
 import { isNil } from "lodash";
 
 import ConfigurationModal from "./ConfigurationModal";
@@ -44,14 +51,49 @@ function Controls() {
   return (
     <>
       {contextHolder}
-      <Flex vertical={false} gap="8">
-        <Button onClick={handleOutgoingStream}>
-          {hasOutgoingStream ? "stop" : "start"}
-        </Button>
-        <Button onClick={handleMuteAndUnmuteAudio}>
-          {isMuted ? "unmute" : "mute"}
-        </Button>
-        <Button onClick={() => setIsConfigModalOpen((t) => !t)}>Config</Button>
+      <Flex
+        vertical={false}
+        style={{
+          gap: "1rem",
+        }}
+      >
+        <Tooltip title={hasOutgoingStream ? "Stop Video" : "Start Video"}>
+          <Button
+            color={hasOutgoingStream ? "danger" : "default"}
+            variant="outlined"
+            onClick={handleOutgoingStream}
+            icon={
+              hasOutgoingStream ? (
+                <VideoCameraOutlined />
+              ) : (
+                <VideoCameraAddOutlined />
+              )
+            }
+            size="large"
+          />
+        </Tooltip>
+        {hasOutgoingStream && (
+          <>
+            <Tooltip title={isMuted ? "Unmute Audio" : "Mute Audio"}>
+              <Button
+                size="large"
+                variant="outlined"
+                color={isMuted ? "danger" : "default"}
+                icon={isMuted ? <AudioMutedOutlined /> : <AudioOutlined />}
+                onClick={handleMuteAndUnmuteAudio}
+              />
+            </Tooltip>
+            <Tooltip title="Open Media Configuration">
+              <Button
+                size="large"
+                variant="outlined"
+                color="default"
+                icon={<ToolOutlined />}
+                onClick={() => setIsConfigModalOpen((t) => !t)}
+              />
+            </Tooltip>
+          </>
+        )}
       </Flex>
       <ConfigurationModal
         isOpen={isConfigModalOpen}

@@ -96,6 +96,7 @@ function VideoChat() {
         vertical
         style={{
           gap: "1rem",
+          maxWidth: "1250px",
           position: "relative",
         }}
       >

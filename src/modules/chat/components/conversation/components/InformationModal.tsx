@@ -1,5 +1,7 @@
 import { useParams } from "react-router-dom";
-import { Flex, Modal, Typography } from "antd";
+import { useAreNotificationsEnabled, useStoreActions } from "@common/store";
+import { requestNotificationPermission } from "@common/utils/messaging";
+import { Flex, Modal, Switch, Typography } from "antd";
 
 interface InformationModalProps {
   isOpen: boolean;
@@ -10,6 +12,14 @@ const { Text, Title } = Typography;
 
 function InformationModal({ isOpen, handleClose }: InformationModalProps) {
   const params = useParams();
+  const { toggleNotifications } = useStoreActions();
+  const areNotificationsEnabled = useAreNotificationsEnabled();
+
+  const handleNotificationsSwitchClick = () => {
+    requestNotificationPermission(toggleNotifications)
+    
+  };
+
   return (
     <>
       <Modal
@@ -27,14 +37,12 @@ function InformationModal({ isOpen, handleClose }: InformationModalProps) {
             users can join the chat simultaneously.
           </Text>
           <Text copyable keyboard>
-            {`https://localhost:5147/chat/${params.chatId}`}
+            {`https://localhost:5174/chat/${params.chatId}`}
           </Text>
           <Title
             level={5}
             style={{
-              marginTop: "0.5rem",
-              marginBottom: "0",
-              marginLeft: "0.5rem",
+              margin: "0.5rem",
             }}
           >
             Privacy & Security
@@ -52,14 +60,7 @@ function InformationModal({ isOpen, handleClose }: InformationModalProps) {
               </Text>
             </li>
           </ul>
-          <Title
-            level={5}
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "0",
-              marginLeft: "0.5rem",
-            }}
-          >
+          <Title level={5} style={{ margin: "0.5rem 0 0.5rem 0.5rem" }}>
             Supported Devices
           </Title>
           <ul>
@@ -73,6 +74,21 @@ function InformationModal({ isOpen, handleClose }: InformationModalProps) {
               </Text>
             </li>
           </ul>
+          <Title
+            level={5}
+            style={{
+              margin: "0.5rem",
+            }}
+          >
+            Notifications
+          </Title>
+          <Flex style={{ margin: "0 0.5rem", justifyContent: "space-between" }}>
+            <Text>Enable notifications for incoming messages</Text>
+            <Switch
+              checked={areNotificationsEnabled}
+              onClick={handleNotificationsSwitchClick}
+            />
+          </Flex>
         </Flex>
       </Modal>
     </>

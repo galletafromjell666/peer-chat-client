@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { usePreferredAudioOutput } from "@common/store";
+import { Typography } from "antd";
 import { isEmpty } from "lodash";
 
 interface VideoPlayerProps {
@@ -8,6 +9,9 @@ interface VideoPlayerProps {
   label: string;
   muted?: boolean;
 }
+
+const { Text } = Typography;
+
 function VideoPlayer({ label, stream, isBigFrame, muted }: VideoPlayerProps) {
   const preferredAudioOutput = usePreferredAudioOutput();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -29,7 +33,7 @@ function VideoPlayer({ label, stream, isBigFrame, muted }: VideoPlayerProps) {
     <div
       className={`video_container ${isBigFrame ? "big_frame" : "small_frame"}`}
     >
-      <p>{label}</p>
+      <Text>{label}</Text>
       <video
         muted={!!muted}
         autoPlay
