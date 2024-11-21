@@ -177,7 +177,8 @@ function MessageComposer() {
     setMessage("");
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (fileList.length > 0) {
       sendFileToPeer();
       return;
@@ -190,7 +191,13 @@ function MessageComposer() {
   return (
     <Flex
       justify="center"
-      style={{ width: "100%", backgroundColor: token.colorBgContainerDisabled }}
+      style={{
+        width: "100%",
+        backgroundColor: token.colorBgContainerDisabled,
+        borderTopWidth: "0.125rem",
+        borderTopStyle: "solid",
+        borderColor: token.colorBorder,
+      }}
       data-test-id="input-section"
     >
       <Flex
@@ -218,25 +225,33 @@ function MessageComposer() {
           >
             <Button shape="circle" icon={<FileAddOutlined />} />
           </Upload>
-          <Space.Compact style={{ width: "100%", justifyContent: "end" }}>
-            {!hasFileUploaded ? (
-              <Input
-                onChange={(e) => {
-                  setMessage(e.target.value);
-                }}
-                value={message}
-              />
-            ) : (
-              <div>
-                <Tag closable onClose={() => setFileList([])}>
-                  <Text>{fileList[0].name}</Text>
-                </Tag>
-              </div>
-            )}
-            <Button type="primary" onClick={handleSubmit}>
-              Submit
-            </Button>
-          </Space.Compact>
+          <form onSubmit={handleSubmit}>
+            <Space.Compact
+              style={{
+                width: "100%",
+                justifyContent: "end",
+                alignItems: "center",
+              }}
+            >
+              {!hasFileUploaded ? (
+                <Input
+                  onChange={(e) => {
+                    setMessage(e.target.value);
+                  }}
+                  value={message}
+                />
+              ) : (
+                <div>
+                  <Tag closable onClose={() => setFileList([])}>
+                    <Text>{fileList[0].name}</Text>
+                  </Tag>
+                </div>
+              )}
+              <Button type="primary" onClick={() => handleSubmit}>
+                Submit
+              </Button>
+            </Space.Compact>
+          </form>
         </Flex>
       </Flex>
     </Flex>

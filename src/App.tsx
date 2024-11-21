@@ -2,13 +2,14 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ChatRootComponent from "@modules/chat/";
 import Conversation from "@modules/chat/components/conversation";
 import CreateAndJoin from "@modules/chat/components/createAndJoin";
+import Landing from "@modules/landing";
 
 import Invalid from "./modules/chat/components/invalid/";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <h1>some nice intro</h1>,
+    element: <Landing/>,
   },
   {
     path: "chat",

@@ -6,9 +6,14 @@ body {
 	font-size: 1rem;
 	font: inherit;
 	vertical-align: baseline;
-	overflow: hidden;
+	overflow: auto;
 	scrollbar-width: thin;
 	scrollbar-color: #d9d9d9 transparent;
+}
+
+
+form{
+	width: 100%;
 }
 
 ul {

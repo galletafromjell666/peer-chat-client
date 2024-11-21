@@ -16,6 +16,7 @@ function MessageHistory() {
       style={{
         height: "100%",
         width: "100%",
+        alignItems: "center",
         overflowY: "auto",
         overflowX: "hidden",
       }}
@@ -25,8 +26,7 @@ function MessageHistory() {
       <Flex
         vertical
         justify="space-between"
-        align="center"
-        style={{ maxWidth: "1450px" }}
+        style={{ maxWidth: "1450px", width: "100%", padding: "0.5rem" }}
         data-test-id="conversation_area_container"
       >
         {messages.map((m) => {
