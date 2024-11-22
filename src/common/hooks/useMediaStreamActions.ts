@@ -57,6 +57,7 @@ function useMediaStreamActions() {
         );
       });
 
+      peerConnection.restartIce();
       updateMediaStreams({ outgoing: stream });
     } catch (error) {
       console.error("Error accessing media devices:", error);

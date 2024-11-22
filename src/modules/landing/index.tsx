@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
@@ -12,11 +13,13 @@ import {
 } from "antd";
 import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
 
+const { useToken } = theme;
 const { Header, Content, Footer } = Layout;
 const { Text, Title, Paragraph } = Typography;
 
 const Landing: React.FC = () => {
-  const { token } = theme.useToken();
+  const navigate = useNavigate();
+  const { token } = useToken();
   const screens = useBreakpoint();
 
   const [current, setCurrent] = useState(0);
@@ -25,6 +28,9 @@ const Landing: React.FC = () => {
     setCurrent(value);
   };
 
+  const handleStartChattingButton = () => {
+    navigate("/chat/create-join");
+  };
   return (
     <Layout style={{}}>
       <Header
@@ -42,7 +48,9 @@ const Landing: React.FC = () => {
           PeerChat
         </Title>
         <Space>
-          <Button type="primary">Start Chatting</Button>
+          <Button type="primary" onClick={handleStartChattingButton}>
+            Start Chatting
+          </Button>
           <Button>View on GitHub</Button>
         </Space>
       </Header>
@@ -80,7 +88,9 @@ const Landing: React.FC = () => {
               and your chat partner.
             </Title>
             <Flex vertical={!screens.md} style={{ gap: "1rem" }}>
-              <Button type="primary">Start Chatting Now</Button>
+              <Button type="primary" onClick={handleStartChattingButton}>
+                Start Chatting Now
+              </Button>
               <Button>Learn More About PeerChat</Button>
             </Flex>
           </Flex>

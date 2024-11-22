@@ -177,13 +177,17 @@ function MessageComposer() {
     setMessage("");
   };
 
-  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const sendMessage = () => {
     if (fileList.length > 0) {
       sendFileToPeer();
       return;
     }
     sendMessageToPeer();
+  };
+
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    sendMessage();
   };
 
   const hasFileUploaded = fileList.length > 0;
@@ -247,7 +251,7 @@ function MessageComposer() {
                   </Tag>
                 </div>
               )}
-              <Button type="primary" onClick={() => handleSubmit}>
+              <Button type="primary" onClick={sendMessage}>
                 Submit
               </Button>
             </Space.Compact>

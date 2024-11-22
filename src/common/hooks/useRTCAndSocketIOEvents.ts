@@ -19,7 +19,7 @@ import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 const peerConfiguration = {
   iceServers: [
     {
-      urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"],
+      urls: ["stun:stun1.l.google.com:19302", "stun:stun3.l.google.com:19302"],
     },
   ],
 };
@@ -161,7 +161,7 @@ export function useRTCAndSocketIOEvents() {
       // Sets the appropriate description based on the current signalingState
       await peerConnection.setLocalDescription();
       // Send 'negotiation' event with the new offer
-      console.log("sending negotiation to signaling (offer i guess)");
+      console.log("Sending offer: ", peerConnection.localDescription);
       socketIOClient.send("negotiation", peerConnection.localDescription);
     };
 
