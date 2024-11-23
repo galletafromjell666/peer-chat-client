@@ -12,7 +12,7 @@ import {
   PeerChatFileData,
 } from "@peer-chat-types/index";
 
-import { updateMediaStreams } from "./useMediaStreamStore";
+import { outgoingMediaStream, updateMediaStreams } from "./useMediaStreamStore";
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 
@@ -30,6 +30,7 @@ export function useRTCAndSocketIOEvents() {
   const { peerConnectionRef, dataChannelRef } =
     useRTCPeerConnectionContextValue();
 
+  // const out = useOutgoingMediaStream();
   const isPoliteRef = useRef(false);
   const inComingFile = useRef<any>({});
   const chunks = useRef<any>([]);
@@ -248,7 +249,11 @@ export function useRTCAndSocketIOEvents() {
       console.log("useRTCAndSocketIOEvents clean up");
       const peerConnection = peerConnectionRef.current;
       if (!peerConnection) return;
+      // Stop outgoing video tracks to turn off camera indicator
+      outgoingMediaStream?.getVideoTracks().forEach((t) => t?.stop());
+      updateMediaStreams({ outgoing: null });
       const dataChannel = dataChannelRef.current;
+      // Closing and disconnecting connections
       peerConnection.close();
       dataChannel?.close();
       socketIOClient.disconnect();

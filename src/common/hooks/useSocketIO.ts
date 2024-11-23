@@ -27,6 +27,10 @@ export function useSocketIo(configParams?: any) {
       navigate(`/chat/${data}`);
     });
 
+    newClient.subscribe("invalid-handshake", (data) => {
+      navigate(`/chat/${data}/invalid`);
+    });
+
     newClient.subscribe("disconnect", () => {
       console.log("Socket.io client disconnected");
     });
@@ -41,4 +45,3 @@ export function useSocketIo(configParams?: any) {
   // Return the client and the method to update the config
   return { client: client as SocketIoClient, setConfig };
 }
-

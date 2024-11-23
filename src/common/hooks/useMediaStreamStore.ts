@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 
-let incomingMediaStream: MediaStream | null = null;
-let outgoingMediaStream: MediaStream | null = null;
+export let incomingMediaStream: MediaStream | null = null;
+export let outgoingMediaStream: MediaStream | null = null;
 
 const listeners = new Set();
 
