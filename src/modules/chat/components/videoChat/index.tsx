@@ -18,8 +18,6 @@ function VideoChat() {
   const incomingMediaStream = useIncomingMediaStream();
   const outgoingMediaStream = useOutgoingMediaStream();
 
-  console.log({ incomingMediaStream, outgoingMediaStream });
-
   let RenderComponent = null;
   if (
     incomingMediaStream &&

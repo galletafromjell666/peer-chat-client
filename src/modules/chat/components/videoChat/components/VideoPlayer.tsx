@@ -18,7 +18,6 @@ function VideoPlayer({ label, stream, isBigFrame, muted }: VideoPlayerProps) {
 
   useEffect(() => {
     if (stream && videoRef.current) {
-      console.log("Setting srcObject to ", stream.getTracks());
       videoRef.current.srcObject = stream;
     }
   }, [stream]);

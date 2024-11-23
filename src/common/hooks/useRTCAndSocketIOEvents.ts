@@ -38,15 +38,12 @@ export function useRTCAndSocketIOEvents() {
 
   const handleMessageChannelMessage = useCallback(
     (RTCMessage: PeerChatDataChannelMessage) => {
-      console.log("message!", RTCMessage);
       const { action, payload } = RTCMessage;
       if (action === "message") {
-        // this event has a message in its payload!
         const peerChatMessage = transformDataChannelMessageToPeerChatMessage(
           RTCMessage,
           socketIOClient!
         );
-        console.log("adding message to store", peerChatMessage);
         addMessage(peerChatMessage);
         sendNewMessageNotification();
       } else if (action === "start") {
@@ -71,7 +68,6 @@ export function useRTCAndSocketIOEvents() {
         const updatedMessageWithUrl = {
           fileData: { url, status: "complete" } as PeerChatFileData,
         };
-        console.log("message with url", updatedMessageWithUrl);
 
         updateMessage(fileId, updatedMessageWithUrl);
         sendNewMessageNotification();
@@ -98,7 +94,6 @@ export function useRTCAndSocketIOEvents() {
     };
 
     const onChannelMessage = (e: MessageEvent) => {
-      console.log("Data channel message", e);
       if (typeof e.data === "string") {
         const parsedData = JSON.parse(e.data) as PeerChatDataChannelMessage;
         handleMessageChannelMessage(parsedData);
@@ -110,7 +105,7 @@ export function useRTCAndSocketIOEvents() {
 
         chunks.current.push(e.data);
         const { byteLength } = e.data;
-        console.log("increasing receivedSize", {
+        console.log("Increasing receivedSize", {
           byteLength,
           current: receivedSize.current,
         });
@@ -123,8 +118,6 @@ export function useRTCAndSocketIOEvents() {
         ).toFixed(2);
         console.log(`Receive progress: ${progress}%`);
       }
-
-      // TODO: Add handlers
     };
 
     const onTrack = (e: RTCTrackEvent) => {
@@ -138,7 +131,7 @@ export function useRTCAndSocketIOEvents() {
 
         const stream = e.streams[0];
         stream.onremovetrack = () => {
-          console.log("incoming track removed", e);
+          console.log("Incoming track removed", e);
           if (stream.getTracks().length === 0) {
             console.log("All tracks removed. Resetting incoming stream.");
             updateMediaStreams({ incoming: null });
@@ -156,6 +149,10 @@ export function useRTCAndSocketIOEvents() {
       }
     };
 
+    const onIceCandidateError = (e: RTCPeerConnectionIceErrorEvent) => {
+      console.error("An error occurred with an ice candidate", e);
+    };
+
     const onNegotiationNeeded = async () => {
       const peerConnection = peerConnectionRef.current;
       console.warn("Negotiation is needed");
@@ -169,7 +166,7 @@ export function useRTCAndSocketIOEvents() {
     // 1. We receive init! it has data, like if we are polite :)
     const handleInitEvent = (data: any) => {
       console.log(
-        "received init event from the signaling server, creating peer connection...",
+        "Received init event from the signaling server, creating peer connection...",
         data
       );
       isPoliteRef.current = data.isPolite;
@@ -199,13 +196,15 @@ export function useRTCAndSocketIOEvents() {
       peerConnection.onnegotiationneeded = onNegotiationNeeded;
 
       peerConnection.onicecandidate = onIceCandidate;
+
+      peerConnection.onicecandidateerror = onIceCandidateError;
     };
 
     socketIOClient.subscribe("init", handleInitEvent);
 
     const handleReceiveNegotiation = async (data: any) => {
       const peerConnection = peerConnectionRef.current;
-      console.log(`Received  ${data.type}  from the signaling server`);
+      console.log(`Received ${data.type} from the signaling server`);
 
       const offerCollision =
         data.type === "offer" && peerConnection.signalingState !== "stable";
@@ -232,14 +231,14 @@ export function useRTCAndSocketIOEvents() {
     // receive candidate
     const handleReceiveCandidate = async (data: any[] = []) => {
       const peerConnection = peerConnectionRef.current;
-      console.log("Received ICE candidate from signaling server", data.length);
+      console.log("Received ICE candidate from signaling server");
       try {
         data.forEach(async (c) => {
           console.log("Adding ICE candidate", c);
           await peerConnection.addIceCandidate(c);
         });
       } catch (error) {
-        console.error("an error ocurred adding ICE candidate", error);
+        console.error("An error occurred adding ICE candidate", error);
       }
     };
 

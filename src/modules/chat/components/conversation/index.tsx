@@ -21,8 +21,6 @@ function Conversation() {
 
   useEffect(() => {
     const chatId = params?.chatId;
-    console.log("Mounting conversation component, chat id : ", chatId);
-    console.log(params?.chatId, socketIOClient);
     if (!socketIOClient) {
       console.log(
         "Empty socketIOClient, this means the user is joining a chat!!"
