@@ -16,6 +16,13 @@ function LandingPageHeader() {
     navigate("/chat/create-join");
   };
 
+  const handleOpeGitHubButton = () => {
+    window.open(
+      "https://github.com/galletafromjell666/peer-chat-client",
+      "_blank"
+    );
+  };
+
   return (
     <Header
       style={{
@@ -40,7 +47,7 @@ function LandingPageHeader() {
         >
           {screens.md ? "Start Chatting" : null}
         </Button>
-        <Button icon={<GithubOutlined />}>
+        <Button onClick={handleOpeGitHubButton} icon={<GithubOutlined />}>
           {screens.md ? "View on GitHub" : null}
         </Button>
       </Space>

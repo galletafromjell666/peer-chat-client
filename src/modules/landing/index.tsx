@@ -3,12 +3,12 @@ import { Layout, theme, Typography } from "antd";
 import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
 
 import DidYouKnow from "./components/DidYouKnow";
+import Hero from "./components/Hero";
 import HowItWorks from "./components/HowItWorks";
 import LandingPageHeader from "./components/LandingPageHeader";
 import PrivacyIsPriority from "./components/PrivacyIsPriority";
 import TechnicalInsights from "./components/TechnicalInsights";
 import WhyPeerChat from "./components/WhyPeerChat";
-import Hero from "./Hero";
 
 const { useToken } = theme;
 const { Content, Footer } = Layout;

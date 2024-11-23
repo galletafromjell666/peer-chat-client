@@ -11,6 +11,13 @@ function Hero() {
     navigate("/chat/create-join");
   };
 
+  const handleLearnMoreButton = () => {
+    window.open(
+      "https://github.com/galletafromjell666/peer-chat-client",
+      "_blank"
+    );
+  };
+
   return (
     <Flex
       vertical
@@ -48,7 +55,9 @@ function Hero() {
           <Button type="primary" onClick={handleStartChattingButton}>
             Start Chatting Now
           </Button>
-          <Button>Learn More About PeerChat</Button>
+          <Button onClick={handleLearnMoreButton}>
+            Learn More About PeerChat
+          </Button>
         </Flex>
       </Flex>
     </Flex>
