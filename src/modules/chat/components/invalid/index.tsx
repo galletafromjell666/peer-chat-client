@@ -24,9 +24,11 @@ function Invalid() {
         width: "100dvw",
         height: "100dvh",
       }}
-      gap="middle"
+      gap="1.5rem"
     >
-      <Title level={2}>Something's Not Quite Right</Title>
+      <Title style={{
+        padding: "0 1rem"
+      }} level={2}>Something's Not Quite Right</Title>
       <Text style={{ alignSelf: "center", margin: "0 2rem" }}>
         {`It looks like something went wrong. The chat room ${chatId} may be full or doesn't exist.`}
       </Text>

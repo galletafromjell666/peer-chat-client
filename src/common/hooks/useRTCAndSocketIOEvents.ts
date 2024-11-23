@@ -63,7 +63,7 @@ export function useRTCAndSocketIOEvents() {
           offset += chunk.byteLength;
         }
 
-        const url = getDataDownloadUrl(fileData, inComingFile.current.type);
+        const url = getDataDownloadUrl(fileData);
 
         const updatedMessageWithUrl = {
           fileData: { url, status: "complete" } as PeerChatFileData,
@@ -202,7 +202,9 @@ export function useRTCAndSocketIOEvents() {
 
     socketIOClient.subscribe("init", handleInitEvent);
 
-    const handleReceiveNegotiation = async (data: any) => {
+    const handleReceiveNegotiation = async (
+      data: RTCSessionDescriptionInit
+    ) => {
       const peerConnection = peerConnectionRef.current;
       console.log(`Received ${data.type} from the signaling server`);
 
@@ -226,10 +228,13 @@ export function useRTCAndSocketIOEvents() {
       }
     };
 
-    socketIOClient.subscribe("receive-negotiation", handleReceiveNegotiation);
+    socketIOClient.subscribe<RTCSessionDescriptionInit>(
+      "receive-negotiation",
+      handleReceiveNegotiation
+    );
 
     // receive candidate
-    const handleReceiveCandidate = async (data: any[] = []) => {
+    const handleReceiveCandidate = async (data: RTCIceCandidate[] = []) => {
       const peerConnection = peerConnectionRef.current;
       console.log("Received ICE candidate from signaling server");
       try {
@@ -242,7 +247,10 @@ export function useRTCAndSocketIOEvents() {
       }
     };
 
-    socketIOClient.subscribe("receive-candidate", handleReceiveCandidate);
+    socketIOClient.subscribe<RTCIceCandidate[]>(
+      "receive-candidate",
+      handleReceiveCandidate
+    );
 
     return () => {
       console.log("useRTCAndSocketIOEvents clean up");

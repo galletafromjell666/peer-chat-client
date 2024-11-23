@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileAddOutlined } from "@ant-design/icons";
+import { FileAddOutlined, SendOutlined } from "@ant-design/icons";
 import { useRTCPeerConnectionContextValue } from "@common/hooks/useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "@common/hooks/useSocketIOContextValue";
 import { useIsSendingFile, useStoreActions } from "@common/store";
@@ -23,6 +23,7 @@ import {
   Upload,
 } from "antd";
 import { RcFile } from "antd/es/upload/interface";
+import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -31,6 +32,8 @@ const CHUNK_SIZE = 16384;
 
 function MessageComposer() {
   const { token } = useToken();
+  const screens = useBreakpoint();
+
   const [message, setMessage] = useState("");
   const [fileList, setFileList] = useState<RcFile[]>([]);
 
@@ -116,7 +119,7 @@ function MessageComposer() {
           dataChannel.send(JSON.stringify(completeMessage));
           setFileList([]);
           console.log("File send complete");
-          const url = getDataDownloadUrl(file, file.type);
+          const url = getDataDownloadUrl(file);
           const updatedMessage = {
             fileData: { status: "complete", url } as PeerChatFileData,
           };
@@ -177,7 +180,7 @@ function MessageComposer() {
     setMessage("");
   };
 
-  const sendMessage = () => {
+  const handleSendMessage = () => {
     if (fileList.length > 0) {
       sendFileToPeer();
       return;
@@ -187,7 +190,7 @@ function MessageComposer() {
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    sendMessage();
+    handleSendMessage();
   };
 
   const hasFileUploaded = fileList.length > 0;
@@ -196,7 +199,8 @@ function MessageComposer() {
     <Flex
       justify="center"
       style={{
-        width: "100%",
+        alignSelf: "flex-start",
+        width: "100vw",
         backgroundColor: token.colorBgContainerDisabled,
         borderTopWidth: "0.125rem",
         borderTopStyle: "solid",
@@ -214,7 +218,7 @@ function MessageComposer() {
           style={{
             padding: "0.65rem 0.5rem",
             width: "100%",
-            gap: "1rem",
+            gap: screens.xs ? "0.5rem" : "1rem",
           }}
         >
           <Upload
@@ -239,6 +243,7 @@ function MessageComposer() {
             >
               {!hasFileUploaded ? (
                 <Input
+                  placeholder="Type a message..."
                   onChange={(e) => {
                     setMessage(e.target.value);
                   }}
@@ -251,8 +256,13 @@ function MessageComposer() {
                   </Tag>
                 </div>
               )}
-              <Button type="primary" onClick={sendMessage}>
-                Submit
+              <Button
+                iconPosition="end"
+                icon={screens.xs ? <SendOutlined /> : null}
+                type="primary"
+                onClick={handleSendMessage}
+              >
+                {!screens.xs ? "Submit" : null}
               </Button>
             </Space.Compact>
           </form>

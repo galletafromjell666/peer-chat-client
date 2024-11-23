@@ -8,7 +8,7 @@ export const downloadFileFromUrl = (url: string, filename: string) => {
   document.body.removeChild(link);
 };
 
-export const getDataDownloadUrl = (data: any, type: string) => {
+export const getDataDownloadUrl = (data: any) => {
   const url = URL.createObjectURL(new Blob([data]));
   return url
 };

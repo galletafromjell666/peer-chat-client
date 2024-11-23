@@ -5,6 +5,7 @@ import useMediaStreamActions from "@common/hooks/useMediaStreamActions";
 import { useOutgoingMediaStream } from "@common/hooks/useMediaStreamStore";
 import { mediaDevicesErrorAccessMessage } from "@common/utils/constants";
 import { Button, Flex, notification, Space, theme } from "antd";
+import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
 import { isNil } from "lodash";
 
 import InformationModal from "./InformationModal";
@@ -15,6 +16,8 @@ const { useNotification } = notification;
 function Header() {
   const params = useParams();
   const { token } = useToken();
+  const screens = useBreakpoint();
+
   const [msg, contextHolder] = useNotification();
   const outgoingMediaStream = useOutgoingMediaStream();
   const { addMediaStreamToRTCConnection, removeMediaStreamToRTCConnection } =
@@ -44,7 +47,7 @@ function Header() {
         data-test-id="header"
         justify="center"
         style={{
-          width: "100%",
+          width: "100vw",
           backgroundColor: token.colorBgContainerDisabled,
           borderBottomWidth: "0.125rem",
           borderBottomStyle: "solid",
@@ -67,8 +70,16 @@ function Header() {
               onClick={() => setIsInformationModalOpen(true)}
               iconPosition="end"
               icon={<InfoCircleOutlined />}
+              style={
+                screens.xs
+                  ? {
+                      fontWeight: "600",
+                      fontStyle: "italic",
+                    }
+                  : {}
+              }
             >
-              {chatId}
+              {!screens.xs ? chatId : "PeerChat"}
             </Button>
           </Space>
           <Space>
