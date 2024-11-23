@@ -1,10 +1,11 @@
 import { EventEmitter } from "events";
 import io, { Socket } from "socket.io-client";
 
-interface SocketIOClientConfig {
-  // token: string;
+export interface SocketIOClientConfig {
   url: string;
-  query: any;
+  query: {
+    [key: string]: string;
+  };
 }
 
 export default class SocketIoClient extends EventEmitter {

@@ -1,9 +1,11 @@
 import { useSyncExternalStore } from "react";
 
+type Listener = () => void;
+
 export let incomingMediaStream: MediaStream | null = null;
 export let outgoingMediaStream: MediaStream | null = null;
 
-const listeners = new Set();
+const listeners = new Set<Listener>();
 
 function setIncomingMediaStream(stream: MediaStream | null) {
   incomingMediaStream = stream;
@@ -15,13 +17,13 @@ function setOutgoingMediaStream(stream: MediaStream | null) {
   notifyListeners();
 }
 
-function subscribe(callback: any) {
+function subscribe(callback: Listener) {
   listeners.add(callback);
   return () => listeners.delete(callback);
 }
 
 function notifyListeners() {
-  listeners.forEach((listener: any) => listener());
+  listeners.forEach((listener: Listener) => listener());
 }
 
 export function useIncomingMediaStream() {
