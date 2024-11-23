@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useRef } from "react";
 import { useStoreActions } from "@common/store";
 import { getDataDownloadUrl } from "@common/utils/files";
@@ -30,11 +29,10 @@ export function useRTCAndSocketIOEvents() {
   const { peerConnectionRef, dataChannelRef } =
     useRTCPeerConnectionContextValue();
 
-  // const out = useOutgoingMediaStream();
   const isPoliteRef = useRef(false);
-  const inComingFile = useRef<any>({});
-  const chunks = useRef<any>([]);
-  const receivedSize = useRef<any>(0);
+  const inComingFile = useRef<File | null>(null);
+  const chunks = useRef<ArrayBuffer[]>([]);
+  const receivedSize = useRef<number>(0);
 
   const handleMessageChannelMessage = useCallback(
     (RTCMessage: PeerChatDataChannelMessage) => {
@@ -47,7 +45,7 @@ export function useRTCAndSocketIOEvents() {
         addMessage(peerChatMessage);
         sendNewMessageNotification();
       } else if (action === "start") {
-        inComingFile.current = payload;
+        inComingFile.current = payload as File;
         const peerChatMessageWithFile =
           transformDataChannelFileMessagesToPeerChatMessage(
             RTCMessage,
