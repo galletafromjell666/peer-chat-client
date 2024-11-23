@@ -67,7 +67,7 @@ export function useRTCAndSocketIOEvents() {
           fileData: { url, status: "complete" } as PeerChatFileData,
         };
 
-        updateMessage(fileId, updatedMessageWithUrl);
+        updateMessage(fileId!, updatedMessageWithUrl);
         sendNewMessageNotification();
       }
     },
@@ -162,7 +162,7 @@ export function useRTCAndSocketIOEvents() {
     };
 
     // 1. We receive init! it has data, like if we are polite :)
-    const handleInitEvent = (data: any) => {
+    const handleInitEvent = (data: { isPolite: boolean }) => {
       console.log(
         "Received init event from the signaling server, creating peer connection...",
         data

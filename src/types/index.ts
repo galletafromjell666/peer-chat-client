@@ -21,8 +21,13 @@ export interface PeerChatMessage {
   fileData?: PeerChatFileData;
 }
 
+export interface PeerChatMessagePayload {
+  id: string;
+  message: string;
+}
+
 export interface PeerChatDataChannelMessage {
-  payload: unknown;
+  payload: Partial<PeerChatFileData> | PeerChatMessagePayload;
   originatorId: string;
   timestamp: number;
   action: string;

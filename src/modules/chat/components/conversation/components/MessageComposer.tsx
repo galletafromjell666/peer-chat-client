@@ -3,6 +3,7 @@ import { FileAddOutlined, SendOutlined } from "@ant-design/icons";
 import { useRTCPeerConnectionContextValue } from "@common/hooks/useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "@common/hooks/useSocketIOContextValue";
 import { useIsSendingFile, useStoreActions } from "@common/store";
+import { CHUNK_SIZE } from "@common/utils/constants";
 import { getDataDownloadUrl } from "@common/utils/files";
 import {
   transformDataChannelFileMessagesToPeerChatMessage,
@@ -27,8 +28,6 @@ import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
 
 const { Text } = Typography;
 const { useToken } = theme;
-
-const CHUNK_SIZE = 16384;
 
 function MessageComposer() {
   const { token } = useToken();

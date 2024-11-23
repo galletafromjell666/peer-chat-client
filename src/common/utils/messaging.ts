@@ -3,6 +3,7 @@ import {
   PeerChatDataChannelMessage,
   PeerChatFileData,
   PeerChatMessage,
+  PeerChatMessagePayload,
 } from "@peer-chat-types/index";
 
 import SocketIoClient from "./socketIOInstance";
@@ -13,12 +14,13 @@ export const transformDataChannelMessageToPeerChatMessage = (
 ) => {
   const { originatorId, timestamp, payload } = RTCMessage;
   const isReceived = originatorId !== socketIOClient?.socket.id;
+  const { id, message } = payload as PeerChatMessagePayload;
 
   const transformedMessage: PeerChatMessage = {
-    id: payload.id,
+    id: id,
     originatorId,
     timestamp,
-    message: payload.message,
+    message: message,
     isReceived,
   };
   return transformedMessage;
