@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { InfoCircleOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import useMediaStreamActions from "@common/hooks/useMediaStreamActions";
 import { useOutgoingMediaStream } from "@common/hooks/useMediaStreamStore";
@@ -13,7 +13,6 @@ const { useToken } = theme;
 const { useNotification } = notification;
 
 function Header() {
-  const x = useNavigate();
   const params = useParams();
   const { token } = useToken();
   const [msg, contextHolder] = useNotification();
@@ -70,13 +69,6 @@ function Header() {
               icon={<InfoCircleOutlined />}
             >
               {chatId}
-            </Button>
-            <Button
-              onClick={() => {
-                x("/");
-              }}
-            >
-              Back
             </Button>
           </Space>
           <Space>
