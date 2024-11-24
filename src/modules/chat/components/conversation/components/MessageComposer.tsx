@@ -186,6 +186,8 @@ function MessageComposer() {
   };
 
   const handleSendMessage = () => {
+    if (!isPeerConnected) return;
+
     if (fileList.length > 0) {
       sendFileToPeer();
       return;

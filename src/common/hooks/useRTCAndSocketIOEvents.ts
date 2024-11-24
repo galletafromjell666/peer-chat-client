@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useStoreActions } from "@common/store";
+import { peerConnectionConfiguration } from "@common/utils/constants";
 import { getDataDownloadUrl } from "@common/utils/files";
 import {
   sendNewMessageNotification,
@@ -15,25 +16,17 @@ import { outgoingMediaStream, updateMediaStreams } from "./useMediaStreamStore";
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 
-const peerConfiguration = {
-  iceServers: [
-    {
-      urls: ["stun:stun1.l.google.com:19302", "stun:stun3.l.google.com:19302"],
-    },
-  ],
-};
-
 export function useRTCAndSocketIOEvents() {
+  const isPoliteRef = useRef(false);
+  const inComingFile = useRef<File | null>(null);
+  const chunks = useRef<ArrayBuffer[]>([]);
+  const receivedSize = useRef<number>(0);
+
   const { addMessage, updateMessage, updateIsPeerConnected } =
     useStoreActions();
   const { client: socketIOClient } = useSocketIoClientContextValue();
   const { peerConnectionRef, dataChannelRef } =
     useRTCPeerConnectionContextValue();
-
-  const isPoliteRef = useRef(false);
-  const inComingFile = useRef<File | null>(null);
-  const chunks = useRef<ArrayBuffer[]>([]);
-  const receivedSize = useRef<number>(0);
 
   const handleMessageChannelMessage = useCallback(
     (RTCMessage: PeerChatDataChannelMessage) => {
@@ -171,11 +164,13 @@ export function useRTCAndSocketIOEvents() {
         data
       );
       isPoliteRef.current = data.isPolite;
-  
+
       // We receive init when we start a connection or the other peer has disconnected
       updateIsPeerConnected(false);
 
-      peerConnectionRef.current = new RTCPeerConnection(peerConfiguration);
+      peerConnectionRef.current = new RTCPeerConnection(
+        peerConnectionConfiguration
+      );
       const peerConnection = peerConnectionRef.current;
       // TODO: move to the caller?
       dataChannelRef.current = peerConnection.createDataChannel("chat");
@@ -274,5 +269,6 @@ export function useRTCAndSocketIOEvents() {
     handleMessageChannelMessage,
     peerConnectionRef,
     socketIOClient,
+    updateIsPeerConnected,
   ]);
 }

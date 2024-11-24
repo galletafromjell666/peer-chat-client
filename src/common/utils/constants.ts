@@ -5,3 +5,11 @@ export const mediaDevicesErrorAccessMessage = {
 };
 
 export const CHUNK_SIZE = 16384;
+
+export const peerConnectionConfiguration = {
+  iceServers: [
+    {
+      urls: ["stun:stun1.l.google.com:19302", "stun:stun3.l.google.com:19302"],
+    },
+  ],
+};
