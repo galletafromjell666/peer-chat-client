@@ -8,6 +8,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 const initialState: AppState = {
+  isPeerConnected: false,
   isSmallScreenNoticeOpen: true,
   areNotificationsEnabled: false,
   preferredAudioInput: "",
@@ -66,6 +67,8 @@ export const useStore = create<Store>()(
           })),
         updateIsSmallScreenNoticeOpen: (isSmallScreenNoticeOpen: boolean) =>
           set(() => ({ isSmallScreenNoticeOpen })),
+        updateIsPeerConnected: (isPeerConnected: boolean) =>
+          set(() => ({ isPeerConnected })),
       },
     }),
     {
@@ -90,3 +93,5 @@ export const usePreferredVideoInput = () =>
   useStore((state) => state.preferredVideoInput);
 export const useIsSmallScreenNoticeOpen = () =>
   useStore((state) => state.isSmallScreenNoticeOpen);
+export const useIsPeerConnected = () =>
+  useStore((state) => state.isPeerConnected);

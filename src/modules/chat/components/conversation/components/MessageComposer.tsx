@@ -2,7 +2,11 @@ import { useState } from "react";
 import { FileAddOutlined, SendOutlined } from "@ant-design/icons";
 import { useRTCPeerConnectionContextValue } from "@common/hooks/useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "@common/hooks/useSocketIOContextValue";
-import { useIsSendingFile, useStoreActions } from "@common/store";
+import {
+  useIsPeerConnected,
+  useIsSendingFile,
+  useStoreActions,
+} from "@common/store";
 import { CHUNK_SIZE } from "@common/utils/constants";
 import { getDataDownloadUrl } from "@common/utils/files";
 import {
@@ -32,6 +36,7 @@ const { useToken } = theme;
 function MessageComposer() {
   const { token } = useToken();
   const screens = useBreakpoint();
+  const isPeerConnected = useIsPeerConnected();
 
   const [message, setMessage] = useState("");
   const [fileList, setFileList] = useState<RcFile[]>([]);
@@ -41,6 +46,7 @@ function MessageComposer() {
   const { client: socketIOClient } = useSocketIoClientContextValue();
   const isSendingFile = useIsSendingFile();
 
+  // TODO: Abstract some of this logic to a hook?
   const sendFileToPeer = () => {
     const dataChannel = dataChannelRef.current;
     const fileId = crypto.randomUUID() as string;
@@ -257,6 +263,7 @@ function MessageComposer() {
                 </div>
               )}
               <Button
+                disabled={!isPeerConnected}
                 iconPosition="end"
                 icon={isExtraSmallScreen ? <SendOutlined /> : null}
                 type="primary"

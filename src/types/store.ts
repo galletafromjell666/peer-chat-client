@@ -1,6 +1,7 @@
 import { PeerChatMessage, PeerChatUser } from ".";
 
 export interface AppState {
+  isPeerConnected: boolean;
   isSmallScreenNoticeOpen: boolean;
   areNotificationsEnabled: boolean;
   preferredAudioInput: string;
@@ -13,6 +14,7 @@ export interface AppState {
 
 export type AppStateActions = {
   toggleNotifications: () => void;
+  updateIsPeerConnected: (isPeerConnected: boolean) => void;
   updateIsSmallScreenNoticeOpen: (isSmallScreenNoticeOpen: boolean) => void;
   updatePreferredVideoInput: (preferredVideoInput: string) => void;
   updatePreferredAudioOutput: (preferredAudioOutput: string) => void;

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { InfoCircleOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import useMediaStreamActions from "@common/hooks/useMediaStreamActions";
 import { useOutgoingMediaStream } from "@common/hooks/useMediaStreamStore";
+import { useIsPeerConnected } from "@common/store";
 import { mediaDevicesErrorAccessMessage } from "@common/utils/constants";
 import { Button, Flex, notification, Space, theme } from "antd";
 import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
@@ -17,6 +18,7 @@ function Header() {
   const params = useParams();
   const { token } = useToken();
   const screens = useBreakpoint();
+  const isPeerConnected = useIsPeerConnected();
 
   const [msg, contextHolder] = useNotification();
   const outgoingMediaStream = useOutgoingMediaStream();
@@ -86,6 +88,7 @@ function Header() {
           </Space>
           <Space>
             <Button
+              disabled={!isPeerConnected}
               onClick={handleOutgoingStream}
               shape="circle"
               icon={<VideoCameraOutlined />}

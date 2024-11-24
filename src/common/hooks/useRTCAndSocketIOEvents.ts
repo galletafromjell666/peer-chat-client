@@ -24,7 +24,8 @@ const peerConfiguration = {
 };
 
 export function useRTCAndSocketIOEvents() {
-  const { addMessage, updateMessage } = useStoreActions();
+  const { addMessage, updateMessage, updateIsPeerConnected } =
+    useStoreActions();
   const { client: socketIOClient } = useSocketIoClientContextValue();
   const { peerConnectionRef, dataChannelRef } =
     useRTCPeerConnectionContextValue();
@@ -80,10 +81,12 @@ export function useRTCAndSocketIOEvents() {
     console.log("BackgroundEvents init!", socketIOClient);
 
     const onChannelOpen = (e: Event) => {
+      updateIsPeerConnected(true);
       console.log("Data channel is open", e);
     };
 
     const onChannelClose = (e: Event) => {
+      updateIsPeerConnected(false);
       console.log("Data channel is closed", e);
     };
 
@@ -168,6 +171,9 @@ export function useRTCAndSocketIOEvents() {
         data
       );
       isPoliteRef.current = data.isPolite;
+  
+      // We receive init when we start a connection or the other peer has disconnected
+      updateIsPeerConnected(false);
 
       peerConnectionRef.current = new RTCPeerConnection(peerConfiguration);
       const peerConnection = peerConnectionRef.current;
