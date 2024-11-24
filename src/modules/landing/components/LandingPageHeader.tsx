@@ -23,6 +23,8 @@ function LandingPageHeader() {
     );
   };
 
+  const isMediumScreen = screens.md;
+
   return (
     <Header
       style={{
@@ -45,10 +47,10 @@ function LandingPageHeader() {
           type="primary"
           onClick={handleStartChattingButton}
         >
-          {screens.md ? "Start Chatting" : null}
+          {isMediumScreen ? "Start Chatting" : null}
         </Button>
         <Button onClick={handleOpeGitHubButton} icon={<GithubOutlined />}>
-          {screens.md ? "View on GitHub" : null}
+          {isMediumScreen ? "View on GitHub" : null}
         </Button>
       </Space>
     </Header>

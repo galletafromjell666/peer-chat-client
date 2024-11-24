@@ -193,13 +193,14 @@ function MessageComposer() {
   };
 
   const hasFileUploaded = fileList.length > 0;
+  const isExtraSmallScreen = screens.xs;
 
   return (
     <Flex
       justify="center"
       style={{
         alignSelf: "flex-start",
-        width: "100vw",
+        width: "100%",
         backgroundColor: token.colorBgContainerDisabled,
         borderTopWidth: "0.125rem",
         borderTopStyle: "solid",
@@ -217,7 +218,7 @@ function MessageComposer() {
           style={{
             padding: "0.65rem 0.5rem",
             width: "100%",
-            gap: screens.xs ? "0.5rem" : "1rem",
+            gap: isExtraSmallScreen ? "0.5rem" : "1rem",
           }}
         >
           <Upload
@@ -257,11 +258,11 @@ function MessageComposer() {
               )}
               <Button
                 iconPosition="end"
-                icon={screens.xs ? <SendOutlined /> : null}
+                icon={isExtraSmallScreen ? <SendOutlined /> : null}
                 type="primary"
                 onClick={handleSendMessage}
               >
-                {!screens.xs ? "Submit" : null}
+                {!isExtraSmallScreen ? "Submit" : null}
               </Button>
             </Space.Compact>
           </form>

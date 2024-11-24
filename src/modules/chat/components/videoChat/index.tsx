@@ -5,6 +5,9 @@ import {
 import { Flex, theme } from "antd";
 const { useToken } = theme;
 
+import SmallScreenNotice from "@common/components/SmallScreenNotice";
+import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
+
 import Controls from "./components/MediaControls";
 import VideoPlayer from "./components/VideoPlayer";
 
@@ -17,6 +20,8 @@ function VideoChat() {
   const { token } = useToken();
   const incomingMediaStream = useIncomingMediaStream();
   const outgoingMediaStream = useOutgoingMediaStream();
+
+  const screens = useBreakpoint();
 
   let RenderComponent = null;
   if (
@@ -76,32 +81,37 @@ function VideoChat() {
 
   if (!RenderComponent) return null;
 
+  const isExtraSmallScreen = screens.xs;
+
   return (
-    <Flex
-      style={{
-        alignItems: "center",
-        width: "60%",
-        flexDirection: "column",
-        justifyContent: "center",
-        gap: "1rem",
-        height: "100%",
-        padding: "0.75rem",
-        borderColor: token.colorBorder,
-        borderRightStyle: "solid",
-      }}
-    >
+    <>
+      <SmallScreenNotice />
       <Flex
-        vertical
         style={{
-          gap: "1rem",
-          maxWidth: "1250px",
-          position: "relative",
+          alignItems: "center",
+          width: !isExtraSmallScreen ? "55%" : "unset",
+          flexDirection: "column",
+          justifyContent: "center",
+          gap: !isExtraSmallScreen ? "1rem" : "0.5rem",
+          height: !isExtraSmallScreen ? "100%" : "50%",
+          padding: "0.75rem",
+          borderColor: token.colorBorder,
+          borderRightStyle: !isExtraSmallScreen ? "solid" : "none",
         }}
       >
-        {RenderComponent}
+        <Flex
+          vertical
+          style={{
+            gap: "1rem",
+            maxWidth: "1250px",
+            position: "relative",
+          }}
+        >
+          {RenderComponent}
+        </Flex>
+        <Controls />
       </Flex>
-      <Controls />
-    </Flex>
+    </>
   );
 }
 

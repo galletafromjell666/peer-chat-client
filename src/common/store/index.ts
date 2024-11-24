@@ -8,6 +8,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 const initialState: AppState = {
+  isSmallScreenNoticeOpen: true,
   areNotificationsEnabled: false,
   preferredAudioInput: "",
   preferredVideoInput: "",
@@ -63,6 +64,8 @@ export const useStore = create<Store>()(
           set((state) => ({
             areNotificationsEnabled: !state.areNotificationsEnabled,
           })),
+        updateIsSmallScreenNoticeOpen: (isSmallScreenNoticeOpen: boolean) =>
+          set(() => ({ isSmallScreenNoticeOpen })),
       },
     }),
     {
@@ -76,7 +79,8 @@ export const useStoreActions = () => useStore((state) => state.actions);
 
 export const useMessages = () => useStore((state) => state.messages);
 export const useUsers = () => useStore((state) => state.users);
-export const useAreNotificationsEnabled = () => useStore((state) => state.areNotificationsEnabled);
+export const useAreNotificationsEnabled = () =>
+  useStore((state) => state.areNotificationsEnabled);
 export const useIsSendingFile = () => useStore((state) => state.isSendingFile);
 export const usePreferredAudioOutput = () =>
   useStore((state) => state.preferredAudioOutput);
@@ -84,3 +88,5 @@ export const usePreferredAudioInput = () =>
   useStore((state) => state.preferredAudioInput);
 export const usePreferredVideoInput = () =>
   useStore((state) => state.preferredVideoInput);
+export const useIsSmallScreenNoticeOpen = () =>
+  useStore((state) => state.isSmallScreenNoticeOpen);

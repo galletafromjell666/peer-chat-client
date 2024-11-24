@@ -40,6 +40,8 @@ function Header() {
 
   const chatId = params.chatId;
 
+  const isSmallScreen = (screens.sm || screens.xs) && !screens.md;
+
   return (
     <>
       {contextHolder}
@@ -47,7 +49,7 @@ function Header() {
         data-test-id="header"
         justify="center"
         style={{
-          width: "100vw",
+          width: "100%",
           backgroundColor: token.colorBgContainerDisabled,
           borderBottomWidth: "0.125rem",
           borderBottomStyle: "solid",
@@ -71,7 +73,7 @@ function Header() {
               iconPosition="end"
               icon={<InfoCircleOutlined />}
               style={
-                screens.xs
+                isSmallScreen
                   ? {
                       fontWeight: "600",
                       fontStyle: "italic",
@@ -79,7 +81,7 @@ function Header() {
                   : {}
               }
             >
-              {!screens.xs ? chatId : "PeerChat"}
+              {!isSmallScreen ? chatId : "PeerChat"}
             </Button>
           </Space>
           <Space>

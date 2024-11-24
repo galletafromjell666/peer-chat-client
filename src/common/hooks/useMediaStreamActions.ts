@@ -97,7 +97,7 @@ function useMediaStreamActions() {
 
     senders.forEach((sender) => {
       if (sender.track && sender.track.kind === kind) {
-        console.log("changing track", sender.track, " enabled to ", value);
+        console.log("Changing track", sender.track, " enabled to ", value);
         sender.track.enabled = value;
       }
     });

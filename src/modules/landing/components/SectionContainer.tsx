@@ -19,6 +19,9 @@ function SectionContainer({
 }: SectionContainerProps) {
   const { token } = useToken();
   const screens = useBreakpoint();
+
+  const isMediumScreen = screens.md;
+
   return (
     <Flex
       vertical
@@ -42,10 +45,10 @@ function SectionContainer({
         </Title>
       )}
       <Flex
-        vertical={!screens.md}
+        vertical={!isMediumScreen}
         style={{
           justifyContent: "center",
-          alignItems: !screens.md ? "center" : "unset",
+          alignItems: !isMediumScreen ? "center" : "unset",
         }}
         gap="2rem"
       >

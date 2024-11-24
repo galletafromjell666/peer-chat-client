@@ -18,6 +18,8 @@ function Hero() {
     );
   };
 
+  const isMediumScreen = screens.md;
+
   return (
     <Flex
       vertical
@@ -44,14 +46,14 @@ function Hero() {
         style={{
           maxWidth: "35rem",
           gap: "0.75rem",
-          alignSelf: screens.md ? "flex-end" : "unset",
+          alignSelf: isMediumScreen ? "flex-end" : "unset",
         }}
       >
         <Title level={4}>
           Your privacy matters. No stateful servers, no snooping, just you and
           your chat partner.
         </Title>
-        <Flex vertical={!screens.md} style={{ gap: "1rem" }}>
+        <Flex vertical={!isMediumScreen} style={{ gap: "1rem" }}>
           <Button type="primary" onClick={handleStartChattingButton}>
             Start Chatting Now
           </Button>
