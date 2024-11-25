@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import { useAreNotificationsEnabled, useStoreActions } from "@common/store";
 import { requestNotificationPermission } from "@common/utils/messaging";
 import { Flex, Modal, Switch, Typography } from "antd";
@@ -11,14 +10,14 @@ interface InformationModalProps {
 const { Text, Title } = Typography;
 
 function InformationModal({ isOpen, handleClose }: InformationModalProps) {
-  const params = useParams();
   const { toggleNotifications } = useStoreActions();
   const areNotificationsEnabled = useAreNotificationsEnabled();
 
   const handleNotificationsSwitchClick = () => {
-    requestNotificationPermission(toggleNotifications)
-    
+    requestNotificationPermission(toggleNotifications);
   };
+
+  const fullUrl = window.location.href;
 
   return (
     <>
@@ -37,7 +36,7 @@ function InformationModal({ isOpen, handleClose }: InformationModalProps) {
             users can join the chat simultaneously.
           </Text>
           <Text copyable keyboard>
-            {`https://localhost:5174/chat/${params.chatId}`}
+            {fullUrl}
           </Text>
           <Title
             level={5}

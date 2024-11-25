@@ -24,7 +24,7 @@ export default class SocketIoClient extends EventEmitter {
   }
 
   private _connect() {
-  const connectOptions = {
+    const connectOptions = {
       autoConnect: true,
       forceNew: false,
       reconnection: false,
@@ -35,7 +35,7 @@ export default class SocketIoClient extends EventEmitter {
       ...this.config,
     };
 
-    this.socket = io("https://localhost:3600/", connectOptions);
+    this.socket = io(import.meta.env.VITE_API_URL, connectOptions);
 
     this.socket.on("connect", () => {
       this.emit("connect", this.socket);
