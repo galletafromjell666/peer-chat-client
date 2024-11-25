@@ -2,7 +2,6 @@ import { EventEmitter } from "events";
 import io, { Socket } from "socket.io-client";
 
 export interface SocketIOClientConfig {
-  url: string;
   query: {
     [key: string]: string;
   };
@@ -25,7 +24,7 @@ export default class SocketIoClient extends EventEmitter {
   }
 
   private _connect() {
-    const connectOptions = {
+  const connectOptions = {
       autoConnect: true,
       forceNew: false,
       reconnection: false,

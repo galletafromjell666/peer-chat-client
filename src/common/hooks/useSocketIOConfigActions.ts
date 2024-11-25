@@ -4,7 +4,7 @@ export function useSocketIOConfigActions() {
   const { setConfig } = useSocketIoClientContextValue();
 
   const joinRoom = (roomId: string) => {
-    setConfig({
+    setConfig!({
       query: {
         roomId,
       },
@@ -12,7 +12,7 @@ export function useSocketIOConfigActions() {
   };
 
   const createRoom = () => {
-    setConfig({
+    setConfig!({
       query: {
         action: "create",
       },

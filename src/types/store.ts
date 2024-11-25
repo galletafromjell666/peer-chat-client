@@ -13,6 +13,7 @@ export interface AppState {
 }
 
 export type AppStateActions = {
+  resetConversationValues: () => void;
   toggleNotifications: () => void;
   updateIsPeerConnected: (isPeerConnected: boolean) => void;
   updateIsSmallScreenNoticeOpen: (isSmallScreenNoticeOpen: boolean) => void;

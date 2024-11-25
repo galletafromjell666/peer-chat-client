@@ -22,8 +22,12 @@ export function useRTCAndSocketIOEvents() {
   const chunks = useRef<ArrayBuffer[]>([]);
   const receivedSize = useRef<number>(0);
 
-  const { addMessage, updateMessage, updateIsPeerConnected } =
-    useStoreActions();
+  const {
+    addMessage,
+    updateMessage,
+    updateIsPeerConnected,
+    resetConversationValues,
+  } = useStoreActions();
   const { client: socketIOClient } = useSocketIoClientContextValue();
   const { peerConnectionRef, dataChannelRef } =
     useRTCPeerConnectionContextValue();
@@ -255,6 +259,7 @@ export function useRTCAndSocketIOEvents() {
       console.log("useRTCAndSocketIOEvents clean up");
       const peerConnection = peerConnectionRef.current;
       if (!peerConnection) return;
+      resetConversationValues();
       // Stop outgoing video tracks to turn off camera indicator
       outgoingMediaStream?.getVideoTracks().forEach((t) => t?.stop());
       updateMediaStreams({ outgoing: null });
@@ -264,11 +269,5 @@ export function useRTCAndSocketIOEvents() {
       dataChannel?.close();
       socketIOClient.disconnect();
     };
-  }, [
-    dataChannelRef,
-    handleMessageChannelMessage,
-    peerConnectionRef,
-    socketIOClient,
-    updateIsPeerConnected,
-  ]);
+  }, [dataChannelRef, handleMessageChannelMessage, peerConnectionRef, resetConversationValues, socketIOClient, updateIsPeerConnected]);
 }

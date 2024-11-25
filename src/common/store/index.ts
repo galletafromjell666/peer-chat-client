@@ -4,6 +4,7 @@ import {
   PeerChatUser,
 } from "@peer-chat-types/index";
 import { AppState, Store } from "@peer-chat-types/store";
+import { pick } from "lodash";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
@@ -24,6 +25,17 @@ export const useStore = create<Store>()(
     (set) => ({
       ...initialState,
       actions: {
+        resetConversationValues: () =>
+          set((s) => {
+            const resetValues = pick(initialState, [
+              "isPeerConnected",
+              "messages",
+              "users",
+              "isSendingFile",
+            ]);
+
+            return { ...s, ...resetValues };
+          }),
         addMessage: (message: PeerChatMessage) =>
           set((s) => ({
             messages: s.messages.concat(message),
