@@ -256,9 +256,9 @@ export function useRTCAndSocketIOEvents() {
     );
 
     return () => {
-      console.log("useRTCAndSocketIOEvents clean up");
       const peerConnection = peerConnectionRef.current;
       if (!peerConnection) return;
+      console.log("useRTCAndSocketIOEvents clean up");
       resetConversationValues();
       // Stop outgoing video tracks to turn off camera indicator
       outgoingMediaStream?.getVideoTracks().forEach((t) => t?.stop());
@@ -269,5 +269,12 @@ export function useRTCAndSocketIOEvents() {
       dataChannel?.close();
       socketIOClient.disconnect();
     };
-  }, [dataChannelRef, handleMessageChannelMessage, peerConnectionRef, resetConversationValues, socketIOClient, updateIsPeerConnected]);
+  }, [
+    dataChannelRef,
+    handleMessageChannelMessage,
+    peerConnectionRef,
+    resetConversationValues,
+    socketIOClient,
+    updateIsPeerConnected,
+  ]);
 }
