@@ -47,6 +47,7 @@ function SectionContainer({
       <Flex
         vertical={!isMediumScreen}
         style={{
+          flexFlow: "wrap",
           justifyContent: "center",
           alignItems: !isMediumScreen ? "center" : "unset",
         }}
