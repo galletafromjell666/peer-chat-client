@@ -1,5 +1,6 @@
 import { useStore } from "@common/store";
 import {
+  DataChannelMessageUserAction,
   PeerChatDataChannelMessage,
   PeerChatFileData,
   PeerChatMessage,
@@ -91,4 +92,21 @@ export const sendNewMessageNotification = () => {
   };
 
   new Notification(title, options);
+};
+
+export const createMessageForDataChannelUserAction = (
+  dataChannelMessageUserAction: DataChannelMessageUserAction
+) => {
+  const message: PeerChatMessage = {
+    id: crypto.randomUUID() as string,
+    message: `A user has ${
+      dataChannelMessageUserAction === DataChannelMessageUserAction.JOIN
+        ? "joined"
+        : "left"
+    } this chat`,
+    originatorId: "",
+    timestamp: Date.now(),
+    action: dataChannelMessageUserAction,
+  };
+  return message;
 };

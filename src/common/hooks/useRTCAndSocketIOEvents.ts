@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import { useStoreActions } from "@common/store";
 import { peerConnectionConfiguration } from "@common/utils/constants";
 import { getDataDownloadUrl } from "@common/utils/files";
 import {
+  createMessageForDataChannelUserAction,
   sendNewMessageNotification,
   transformDataChannelFileMessagesToPeerChatMessage,
   transformDataChannelMessageToPeerChatMessage,
 } from "@common/utils/messaging";
 import {
+  DataChannelMessageUserAction,
   PeerChatDataChannelMessage,
   PeerChatFileData,
 } from "@peer-chat-types/index";
@@ -16,6 +19,7 @@ import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue
 import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 
 export function useRTCAndSocketIOEvents() {
+  const params = useParams();
   const isPoliteRef = useRef(false);
   const inComingFile = useRef<File | null>(null);
   const chunks = useRef<ArrayBuffer[]>([]);
@@ -27,9 +31,35 @@ export function useRTCAndSocketIOEvents() {
     updateIsPeerConnected,
     resetConversationValues,
   } = useStoreActions();
-  const { client: socketIOClient } = useSocketIoClientContextValue();
+  const { client: socketIOClient, setConfig } = useSocketIoClientContextValue();
   const { peerConnectionRef, dataChannelRef } =
     useRTCPeerConnectionContextValue();
+
+  const chatId = params?.chatId;
+  const needsCleanUp = chatId !== undefined && Boolean(socketIOClient?.socket);
+
+  useEffect(() => {
+    return () => {
+      if (needsCleanUp) {
+        const peerConnection = peerConnectionRef.current;
+        if (!peerConnection) return;
+        console.log("useRTCAndSocketIOEvents clean up");
+        setConfig?.(undefined);
+        resetConversationValues();
+        const dataChannel = dataChannelRef.current;
+        // Closing and disconnecting connections
+        peerConnection.close();
+        dataChannel?.close();
+      }
+    };
+  }, [
+    dataChannelRef,
+    needsCleanUp,
+    peerConnectionRef,
+    resetConversationValues,
+    setConfig,
+    socketIOClient,
+  ]);
 
   const handleMessageChannelMessage = useCallback(
     (RTCMessage: PeerChatDataChannelMessage) => {
@@ -71,26 +101,8 @@ export function useRTCAndSocketIOEvents() {
     [addMessage, socketIOClient, updateMessage]
   );
 
-  useEffect(() => {
-    if (!socketIOClient) return;
-
-    console.log("BackgroundEvents init!", socketIOClient);
-
-    const onChannelOpen = (e: Event) => {
-      updateIsPeerConnected(true);
-      console.log("Data channel is open", e);
-    };
-
-    const onChannelClose = (e: Event) => {
-      updateIsPeerConnected(false);
-      console.log("Data channel is closed", e);
-    };
-
-    const onChannelError = (e: Event) => {
-      console.error("Data channel error", e);
-    };
-
-    const onChannelMessage = (e: MessageEvent) => {
+  const handleOnChannelMessageEvent = useCallback(
+    (e: MessageEvent) => {
       if (typeof e.data === "string") {
         const parsedData = JSON.parse(e.data) as PeerChatDataChannelMessage;
         handleMessageChannelMessage(parsedData);
@@ -115,7 +127,36 @@ export function useRTCAndSocketIOEvents() {
         ).toFixed(2);
         console.log(`Receive progress: ${progress}%`);
       }
+    },
+    [handleMessageChannelMessage]
+  );
+
+  useEffect(() => {
+    if (!socketIOClient) return;
+
+    console.log("BackgroundEvents init!", socketIOClient);
+
+    const onChannelOpen = (e: Event) => {
+      updateIsPeerConnected(true);
+      addMessage(
+        createMessageForDataChannelUserAction(DataChannelMessageUserAction.JOIN)
+      );
+      console.log("Data channel is open", e);
     };
+
+    const onChannelClose = (e: Event) => {
+      updateIsPeerConnected(false);
+      addMessage(
+        createMessageForDataChannelUserAction(DataChannelMessageUserAction.LEFT)
+      );
+      console.log("Data channel is closed", e);
+    };
+
+    const onChannelError = (e: Event) => {
+      console.error("Data channel error", e);
+    };
+
+    const onChannelMessage = handleOnChannelMessageEvent;
 
     const onIceCandidate = (e: RTCPeerConnectionIceEvent) => {
       if (e.candidate) {
@@ -152,30 +193,28 @@ export function useRTCAndSocketIOEvents() {
       peerConnectionRef.current = new RTCPeerConnection(
         peerConnectionConfiguration
       );
+
       const peerConnection = peerConnectionRef.current;
-      // TODO: move to the caller?
-      dataChannelRef.current = peerConnection.createDataChannel("chat");
-
-      // Configure data channel events
-      dataChannelRef.current.onmessage = onChannelMessage;
-      dataChannelRef.current.onopen = onChannelOpen;
-      dataChannelRef.current.onclose = onChannelClose;
-      dataChannelRef.current.onerror = onChannelError;
-
-      peerConnection.ondatachannel = (e) => {
-        console.log("Data channel event received");
-        const receiveChannel = e.channel;
-        receiveChannel.onmessage = onChannelMessage;
-        receiveChannel.onopen = onChannelOpen;
-        receiveChannel.onclose = onChannelClose;
-        receiveChannel.onerror = onChannelError;
-      };
 
       peerConnection.onnegotiationneeded = onNegotiationNeeded;
 
       peerConnection.onicecandidate = onIceCandidate;
 
       peerConnection.onicecandidateerror = onIceCandidateError;
+
+      // Data Channel stuff
+      dataChannelRef.current = peerConnection.createDataChannel("chat", {
+        negotiated: true,
+        id: 0,
+      });
+
+      dataChannelRef.current.onmessage = onChannelMessage;
+
+      dataChannelRef.current.onopen = onChannelOpen;
+
+      dataChannelRef.current.onclose = onChannelClose;
+
+      dataChannelRef.current.onerror = onChannelError;
     };
 
     socketIOClient.subscribe("init", handleInitEvent);
@@ -230,20 +269,12 @@ export function useRTCAndSocketIOEvents() {
       handleReceiveCandidate
     );
 
-    return () => {
-      const peerConnection = peerConnectionRef.current;
-      if (!peerConnection) return;
-      console.log("useRTCAndSocketIOEvents clean up");
-      resetConversationValues();
-      const dataChannel = dataChannelRef.current;
-      // Closing and disconnecting connections
-      peerConnection.close();
-      dataChannel?.close();
-      socketIOClient.disconnect();
-    };
+    return () => {};
   }, [
+    addMessage,
     dataChannelRef,
     handleMessageChannelMessage,
+    handleOnChannelMessageEvent,
     peerConnectionRef,
     resetConversationValues,
     socketIOClient,

@@ -12,6 +12,11 @@ export interface PeerChatFileData {
   url?: string;
 }
 
+export enum DataChannelMessageUserAction {
+  JOIN = "JOIN",
+  LEFT = "LEFT",
+}
+
 export interface PeerChatMessage {
   id: string;
   message: string;
@@ -19,6 +24,7 @@ export interface PeerChatMessage {
   timestamp: number;
   isReceived?: boolean;
   fileData?: PeerChatFileData;
+  action?: DataChannelMessageUserAction;
 }
 
 export interface PeerChatMessagePayload {

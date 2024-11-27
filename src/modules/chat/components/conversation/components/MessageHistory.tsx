@@ -1,9 +1,9 @@
 import { useMessages } from "@common/store";
 import { downloadFileFromUrl } from "@common/utils/files";
 import { PeerChatFileData } from "@peer-chat-types/index";
-import { Button, Flex, Space, theme, Tooltip, Typography } from "antd";
+import { Button, Divider, Flex, Space, theme, Tooltip, Typography } from "antd";
 import { format, fromUnixTime } from "date-fns";
-import { isEmpty } from "lodash";
+import { isEmpty, isNil } from "lodash";
 
 const { Paragraph, Text } = Typography;
 const { useToken } = theme;
@@ -30,11 +30,23 @@ function MessageHistory() {
         data-test-id="conversation_area_container"
       >
         {messages.map((m) => {
+          const isDataChannelMessageUserAction = !isNil(m?.action);
+          const date = fromUnixTime(m.timestamp / 1000);
+          const formattedLongDate = format(date, "yyyy-MM-dd HH:mm:ss");
+          const formattedShortDate = format(date, "HH:mm");
+
+          if (isDataChannelMessageUserAction) {
+            return (
+              <Divider key={m.id}>
+                <Tooltip title={<span>{formattedLongDate}</span>}>
+                  <Text type="secondary">{`${m.message} - ${formattedShortDate}`}</Text>
+                </Tooltip>
+              </Divider>
+            );
+          }
+
           const isFile = !isEmpty(m.fileData);
           const isOutboundMessage = !m.isReceived;
-          const date = fromUnixTime(m.timestamp / 1000);
-          const formattedShortDate = format(date, "HH:mm");
-          const formattedLongDate = format(date, "yyyy-MM-dd HH:mm:ss");
 
           return (
             <Flex

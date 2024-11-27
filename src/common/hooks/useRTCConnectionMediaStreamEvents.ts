@@ -34,7 +34,7 @@ function useRTCConnectionMediaStreamEvents() {
     peerConnection.ontrack = onTrack;
 
     return () => {
-console.log("clean up useRTCMEdiaStream")
+      console.log("clean up useRTCMediaStream");
       // Stop outgoing video tracks to turn off camera indicator
       outgoingMediaStream?.getVideoTracks().forEach((t) => t?.stop());
       updateMediaStreams({ outgoing: null });

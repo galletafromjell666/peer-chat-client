@@ -19,7 +19,6 @@ function Conversation() {
   const { token } = useToken();
   const params = useParams();
   const screens = useBreakpoint();
-
   const { client: socketIOClient } = useSocketIoClientContextValue();
   const socketIOActions = useSocketIOConfigActions();
 

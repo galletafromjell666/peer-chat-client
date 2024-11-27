@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import SocketIoClient, { SocketIOClientConfig } from "@common/utils/socketIOInstance";
+import SocketIoClient, {
+  SocketIOClientConfig,
+} from "@common/utils/socketIOInstance";
 
 // Uses the socketIO instance from utils
 export function useSocketIo(configParams?: SocketIOClientConfig) {
@@ -38,9 +40,10 @@ export function useSocketIo(configParams?: SocketIOClientConfig) {
     setClient(newClient);
 
     return () => {
+      console.log("useSocketIo clean up");
       newClient.disconnect(); // Clean up connection on unmount
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.query?.roomId, config?.query?.action]);
 
   // Return the client and the method to update the config
