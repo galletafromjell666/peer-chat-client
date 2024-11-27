@@ -12,7 +12,6 @@ import {
   PeerChatFileData,
 } from "@peer-chat-types/index";
 
-import { outgoingMediaStream, updateMediaStreams } from "./useMediaStreamStore";
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 
@@ -118,28 +117,6 @@ export function useRTCAndSocketIOEvents() {
       }
     };
 
-    const onTrack = (e: RTCTrackEvent) => {
-      if (e.streams) {
-        console.log("Received media stream:", e);
-
-        e.track.onended = () => {
-          console.log("Track ended:", e.track);
-          stream.removeTrack(e.track);
-        };
-
-        const stream = e.streams[0];
-        stream.onremovetrack = () => {
-          console.log("Incoming track removed", e);
-          if (stream.getTracks().length === 0) {
-            console.log("All tracks removed. Resetting incoming stream.");
-            updateMediaStreams({ incoming: null });
-          }
-        };
-
-        updateMediaStreams({ incoming: e.streams[0] });
-      }
-    };
-
     const onIceCandidate = (e: RTCPeerConnectionIceEvent) => {
       if (e.candidate) {
         console.log("Sending ICE candidate to signaling server", e.candidate);
@@ -193,8 +170,6 @@ export function useRTCAndSocketIOEvents() {
         receiveChannel.onclose = onChannelClose;
         receiveChannel.onerror = onChannelError;
       };
-
-      peerConnection.ontrack = onTrack;
 
       peerConnection.onnegotiationneeded = onNegotiationNeeded;
 
@@ -256,18 +231,22 @@ export function useRTCAndSocketIOEvents() {
     );
 
     return () => {
-      console.log("useRTCAndSocketIOEvents clean up");
       const peerConnection = peerConnectionRef.current;
       if (!peerConnection) return;
+      console.log("useRTCAndSocketIOEvents clean up");
       resetConversationValues();
-      // Stop outgoing video tracks to turn off camera indicator
-      outgoingMediaStream?.getVideoTracks().forEach((t) => t?.stop());
-      updateMediaStreams({ outgoing: null });
       const dataChannel = dataChannelRef.current;
       // Closing and disconnecting connections
       peerConnection.close();
       dataChannel?.close();
       socketIOClient.disconnect();
     };
-  }, [dataChannelRef, handleMessageChannelMessage, peerConnectionRef, resetConversationValues, socketIOClient, updateIsPeerConnected]);
+  }, [
+    dataChannelRef,
+    handleMessageChannelMessage,
+    peerConnectionRef,
+    resetConversationValues,
+    socketIOClient,
+    updateIsPeerConnected,
+  ]);
 }

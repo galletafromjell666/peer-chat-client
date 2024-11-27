@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useRTCAndSocketIOEvents } from "@common/hooks/useRTCAndSocketIOEvents";
+import useRTCConnectionMediaStreamEvents from "@common/hooks/useRTCConnectionMediaStreamEvents";
 import { useSocketIOConfigActions } from "@common/hooks/useSocketIOConfigActions";
 import { useSocketIoClientContextValue } from "@common/hooks/useSocketIOContextValue";
 import { Flex, theme } from "antd";
@@ -15,7 +15,7 @@ import MessageHistory from "./components/MessageHistory";
 const { useToken } = theme;
 
 function Conversation() {
-  useRTCAndSocketIOEvents();
+  useRTCConnectionMediaStreamEvents();
   const { token } = useToken();
   const params = useParams();
   const screens = useBreakpoint();
