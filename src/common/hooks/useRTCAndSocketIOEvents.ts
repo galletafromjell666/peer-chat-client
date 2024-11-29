@@ -14,7 +14,9 @@ import {
   PeerChatDataChannelMessage,
   PeerChatFileData,
 } from "@peer-chat-types/index";
+import { isNil } from "lodash";
 
+import { outgoingMediaStream, updateMediaStreams } from "./useMediaStreamStore";
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";
 import { useSocketIoClientContextValue } from "./useSocketIOContextValue";
 
@@ -36,6 +38,7 @@ export function useRTCAndSocketIOEvents() {
     useRTCPeerConnectionContextValue();
 
   const chatId = params?.chatId;
+  // hacky way to trigger a clean up when we navigate inside the same outlet
   const needsCleanUp = chatId !== undefined && Boolean(socketIOClient?.socket);
 
   useEffect(() => {
@@ -45,11 +48,18 @@ export function useRTCAndSocketIOEvents() {
         if (!peerConnection) return;
         console.log("useRTCAndSocketIOEvents clean up");
         setConfig?.(undefined);
-        resetConversationValues();
         const dataChannel = dataChannelRef.current;
         // Closing and disconnecting connections
-        peerConnection.close();
+
+        // We remove the onclose event handler to avoid receiving a onclose event after dismounting the hook
+        dataChannel.onclose = null;
         dataChannel?.close();
+        resetConversationValues();
+        // Media stuff clean up
+        peerConnection.close();
+        outgoingMediaStream?.getVideoTracks().forEach((t) => t?.stop());
+        updateMediaStreams({ outgoing: null });
+        updateMediaStreams({ incoming: null });
       }
     };
   }, [
@@ -156,6 +166,28 @@ export function useRTCAndSocketIOEvents() {
       console.error("Data channel error", e);
     };
 
+    const onTrack = (e: RTCTrackEvent) => {
+      if (e.streams) {
+        console.log("Received media stream:", e);
+
+        e.track.onended = () => {
+          console.log("Track ended:", e.track);
+          stream.removeTrack(e.track);
+        };
+
+        const stream = e.streams[0];
+        stream.onremovetrack = () => {
+          console.log("Incoming track removed", e);
+          if (stream.getTracks().length === 0) {
+            console.log("All tracks removed. Resetting incoming stream.");
+            updateMediaStreams({ incoming: null });
+          }
+        };
+
+        updateMediaStreams({ incoming: e.streams[0] });
+      }
+    };
+
     const onChannelMessage = handleOnChannelMessageEvent;
 
     const onIceCandidate = (e: RTCPeerConnectionIceEvent) => {
@@ -190,6 +222,18 @@ export function useRTCAndSocketIOEvents() {
       // We receive init when we start a connection or the other peer has disconnected
       updateIsPeerConnected(false);
 
+      if (!isNil(peerConnectionRef.current)) {
+        // We already have a RTCPeerConnection, this means that this is not the first init that we are handling
+
+        // Right now we just care of adding an action message when we receive a subsequent init
+        if (dataChannelRef.current?.readyState !== "open") return;
+        addMessage(
+          createMessageForDataChannelUserAction(
+            DataChannelMessageUserAction.LEFT
+          )
+        );
+      }
+
       peerConnectionRef.current = new RTCPeerConnection(
         peerConnectionConfiguration
       );
@@ -199,6 +243,8 @@ export function useRTCAndSocketIOEvents() {
       peerConnection.onnegotiationneeded = onNegotiationNeeded;
 
       peerConnection.onicecandidate = onIceCandidate;
+
+      peerConnection.ontrack = onTrack;
 
       peerConnection.onicecandidateerror = onIceCandidateError;
 

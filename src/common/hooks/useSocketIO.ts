@@ -41,6 +41,7 @@ export function useSocketIo(configParams?: SocketIOClientConfig) {
 
     return () => {
       console.log("useSocketIo clean up");
+      setClient(undefined)
       newClient.disconnect(); // Clean up connection on unmount
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
