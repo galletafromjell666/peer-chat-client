@@ -3,6 +3,6 @@ import { RTCPeerConnectionContext } from "@common/contexts/RTCPeerConnectionCont
 
 export const useRTCPeerConnectionContextValue = () =>
   useContext(RTCPeerConnectionContext) as {
-    peerConnectionRef: MutableRefObject<RTCPeerConnection>;
-    dataChannelRef: MutableRefObject<RTCDataChannel>;
+    peerConnectionRef: MutableRefObject<RTCPeerConnection | null>;
+    dataChannelRef: MutableRefObject<RTCDataChannel | null>;
   };

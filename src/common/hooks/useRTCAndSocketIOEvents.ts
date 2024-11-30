@@ -52,8 +52,11 @@ export function useRTCAndSocketIOEvents() {
         // Closing and disconnecting connections
 
         // We remove the onclose event handler to avoid receiving a onclose event after dismounting the hook
-        dataChannel.onclose = null;
-        dataChannel?.close();
+        if (dataChannel) {
+          dataChannel.onclose = null;
+          dataChannel?.close();
+        }
+
         resetConversationValues();
         // Media stuff clean up
         peerConnection.close();
@@ -205,10 +208,10 @@ export function useRTCAndSocketIOEvents() {
       const peerConnection = peerConnectionRef.current;
       console.warn("Negotiation is needed");
       // Sets the appropriate description based on the current signalingState
-      await peerConnection.setLocalDescription();
+      await peerConnection?.setLocalDescription();
       // Send 'negotiation' event with the new offer
-      console.log("Sending offer: ", peerConnection.localDescription);
-      socketIOClient.send("negotiation", peerConnection.localDescription);
+      console.log("Sending offer: ", peerConnection?.localDescription);
+      socketIOClient.send("negotiation", peerConnection?.localDescription);
     };
 
     // 1. We receive init! it has data, like if we are polite :)
@@ -223,15 +226,17 @@ export function useRTCAndSocketIOEvents() {
       updateIsPeerConnected(false);
 
       if (!isNil(peerConnectionRef.current)) {
+        console.warn("This is not the first init...");
         // We already have a RTCPeerConnection, this means that this is not the first init that we are handling
 
         // Right now we just care of adding an action message when we receive a subsequent init
-        if (dataChannelRef.current?.readyState !== "open") return;
-        addMessage(
-          createMessageForDataChannelUserAction(
-            DataChannelMessageUserAction.LEFT
-          )
-        );
+        if (dataChannelRef.current?.readyState === "open") {
+          addMessage(
+            createMessageForDataChannelUserAction(
+              DataChannelMessageUserAction.LEFT
+            )
+          );
+        }
       }
 
       peerConnectionRef.current = new RTCPeerConnection(
@@ -239,12 +244,20 @@ export function useRTCAndSocketIOEvents() {
       );
 
       const peerConnection = peerConnectionRef.current;
-
+      console.log("peer connection created", peerConnection);
       peerConnection.onnegotiationneeded = onNegotiationNeeded;
 
       peerConnection.onicecandidate = onIceCandidate;
 
       peerConnection.ontrack = onTrack;
+
+      peerConnection.onsignalingstatechange = (e: Event) => {
+        const { target } = e;
+        console.debug(
+          "Signaling state change",
+          (target! as unknown as { signalingState: string }).signalingState
+        );
+      };
 
       peerConnection.onicecandidateerror = onIceCandidateError;
 
@@ -254,6 +267,7 @@ export function useRTCAndSocketIOEvents() {
         id: 0,
       });
 
+      console.log("data channel created", dataChannelRef.current);
       dataChannelRef.current.onmessage = onChannelMessage;
 
       dataChannelRef.current.onopen = onChannelOpen;
@@ -269,10 +283,13 @@ export function useRTCAndSocketIOEvents() {
       data: RTCSessionDescriptionInit
     ) => {
       const peerConnection = peerConnectionRef.current;
-      console.log(`Received ${data.type} from the signaling server`);
+      if (!peerConnection) return;
+      console.log(
+        `Received ${data.type} from the signaling server and my state is ${peerConnection?.signalingState}`
+      );
 
       const offerCollision =
-        data.type === "offer" && peerConnection.signalingState !== "stable";
+        data.type === "offer" && peerConnection?.signalingState !== "stable";
 
       if (!isPoliteRef.current && offerCollision) {
         console.warn(
@@ -281,13 +298,13 @@ export function useRTCAndSocketIOEvents() {
         return;
       }
 
-      await peerConnection.setRemoteDescription(data);
+      await peerConnection?.setRemoteDescription(data);
       if (data.type === "offer") {
         console.log(
           "Received an offer, accepted it and sending a answer to signaling"
         );
-        await peerConnection.setLocalDescription();
-        socketIOClient.send("negotiation", peerConnection.localDescription);
+        await peerConnection?.setLocalDescription();
+        socketIOClient.send("negotiation", peerConnection?.localDescription);
       }
     };
 
@@ -299,11 +316,12 @@ export function useRTCAndSocketIOEvents() {
     // receive candidate
     const handleReceiveCandidate = async (data: RTCIceCandidate[] = []) => {
       const peerConnection = peerConnectionRef.current;
+      if (!peerConnection) return;
       console.log("Received ICE candidate from signaling server");
       try {
         data.forEach(async (c) => {
           console.log("Adding ICE candidate", c);
-          await peerConnection.addIceCandidate(c);
+          await peerConnection?.addIceCandidate(c);
         });
       } catch (error) {
         console.error("An error occurred adding ICE candidate", error);
