@@ -8,6 +8,7 @@ import HowItWorks from "./components/HowItWorks";
 import ImagesCarousel from "./components/ImagesCarousel";
 import LandingPageHeader from "./components/LandingPageHeader";
 import PrivacyIsPriority from "./components/PrivacyIsPriority";
+import ServerStatus from "./components/ServerStatus";
 import TechnicalInsights from "./components/TechnicalInsights";
 import WhyPeerChat from "./components/WhyPeerChat";
 
@@ -32,6 +33,7 @@ const Landing: React.FC = () => {
         <WhyPeerChat />
         <ImagesCarousel />
         <HowItWorks />
+        <ServerStatus />
         <PrivacyIsPriority />
         <DidYouKnow />
         <TechnicalInsights />

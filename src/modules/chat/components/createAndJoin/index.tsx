@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSocketIOConfigActions } from "@common/hooks/useSocketIOConfigActions";
 import { Button, Card, Flex, Input, theme, Typography } from "antd";
@@ -12,10 +12,6 @@ function CreateAndJoin() {
   const socketIOActions = useSocketIOConfigActions();
   const navigate = useNavigate();
   const { token } = useToken();
-
-  useEffect(() => {
-    return () => {};
-  }, []);
 
   const handleCreate = () => {
     socketIOActions.createRoom();

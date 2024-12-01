@@ -6,7 +6,7 @@ const { Text} = Typography;
 
 function WhyPeerChat() {
   return (
-    <SectionContainer title="Why PeerChat?" isBordered id="why-peer-chat">
+    <SectionContainer title="Why PeerChat?" isBordered id="why-peer-chat" justifyCenterChildren>
     <Card title="Complete Privacy" bordered style={{ width: 250 }}>
       <Text>
         With PeerChat, your messages never touch a server. Your data stays

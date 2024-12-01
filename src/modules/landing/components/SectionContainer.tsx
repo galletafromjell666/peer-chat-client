@@ -10,12 +10,14 @@ interface SectionContainerProps {
   id?: string;
   isBordered?: boolean;
   children: React.ReactNode;
+  justifyCenterChildren?: boolean;
 }
 function SectionContainer({
   title,
   id,
   isBordered,
   children,
+  justifyCenterChildren,
 }: SectionContainerProps) {
   const { token } = useToken();
   const screens = useBreakpoint();
@@ -48,7 +50,7 @@ function SectionContainer({
         vertical={!isMediumScreen}
         style={{
           flexFlow: "wrap",
-          justifyContent: "center",
+          justifyContent: justifyCenterChildren ? "center" : "",
           alignItems: !isMediumScreen ? "center" : "unset",
         }}
         gap="2rem"
