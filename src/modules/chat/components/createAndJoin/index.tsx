@@ -48,7 +48,7 @@ function CreateAndJoin() {
           <Flex vertical gap={8}>
             <Input
               size="large"
-              placeholder="Conference ID"
+              placeholder="Chat room ID"
               value={joinConferenceId}
               style={{ textAlign: "center" }}
               onChange={handleJoinInput}
@@ -58,14 +58,14 @@ function CreateAndJoin() {
               disabled={!isConferenceIdValid}
               onClick={handleJoin}
             >
-              Join a conference
+              Join a chat room
             </Button>
           </Flex>
           <Text style={{ alignSelf: "center" }} strong>
             Or
           </Text>
           <Button size="large" type="primary" onClick={handleCreate}>
-            Create a conference
+            Create a chat room
           </Button>
         </Flex>
       </Card>
