@@ -19,6 +19,7 @@
     "paths": {
       "@common/*": ["./src/common/*"],
       "@modules/*": ["./src/modules/*"],
+      "@assets/*": ["./src/assets/*"],
       "@peer-chat-types/*": ["./src/types/*"],
     }
   },

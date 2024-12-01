@@ -5,6 +5,7 @@ import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
 import DidYouKnow from "./components/DidYouKnow";
 import Hero from "./components/Hero";
 import HowItWorks from "./components/HowItWorks";
+import ImagesCarousel from "./components/ImagesCarousel";
 import LandingPageHeader from "./components/LandingPageHeader";
 import PrivacyIsPriority from "./components/PrivacyIsPriority";
 import TechnicalInsights from "./components/TechnicalInsights";
@@ -19,7 +20,7 @@ const Landing: React.FC = () => {
   const { token } = useToken();
 
   return (
-    <Layout style={{}}>
+    <Layout>
       <LandingPageHeader />
       <Content
         style={{
@@ -29,6 +30,7 @@ const Landing: React.FC = () => {
       >
         <Hero />
         <WhyPeerChat />
+        <ImagesCarousel />
         <HowItWorks />
         <PrivacyIsPriority />
         <DidYouKnow />

@@ -48,7 +48,7 @@ function MessageComposer() {
 
   // TODO: Abstract some of this logic to a hook?
   const sendFileToPeer = () => {
-    const dataChannel = dataChannelRef.current;
+    const dataChannel = dataChannelRef.current as RTCDataChannel;
     const fileId = crypto.randomUUID() as string;
     const originatorId = socketIOClient?.socket.id ?? "";
 
@@ -164,6 +164,7 @@ function MessageComposer() {
   };
 
   const sendMessageToPeer = () => {
+    const dataChannel = dataChannelRef.current as RTCDataChannel;
     const craftedMessage: PeerChatDataChannelMessage = {
       originatorId: socketIOClient?.socket.id ?? "",
       action: "message",
@@ -175,7 +176,7 @@ function MessageComposer() {
     };
 
     const serializedCraftedMessage = JSON.stringify(craftedMessage);
-    dataChannelRef.current.send(serializedCraftedMessage);
+    dataChannel.send(serializedCraftedMessage);
     addMessage(
       transformDataChannelMessageToPeerChatMessage(
         craftedMessage,
@@ -251,6 +252,7 @@ function MessageComposer() {
             >
               {!hasFileUploaded ? (
                 <Input
+                  autoFocus
                   placeholder="Type a message..."
                   onChange={(e) => {
                     setMessage(e.target.value);
