@@ -11,6 +11,24 @@ PeerChat Client is a feature-rich front-end application built for private and di
 
 PeerChat Client integrates with the PeerChat Server, using Socket.IO for signaling and establishing peer-to-peer connections. Designed with user privacy and simplicity in mind, it ensures a reliable communication experience without storing data on servers.
 
+## Media
+
+![createJoin](https://github.com/user-attachments/assets/6b207248-4752-49d8-a9cb-5521268101fe)
+
+![conversation](https://github.com/user-attachments/assets/f27472fb-47d8-4c58-b4fa-913af1f7e7b6)
+
+![informationWindow](https://github.com/user-attachments/assets/2642db35-fd97-4c43-8f3f-3fdb437a59b8)
+
+![videochat](https://github.com/user-attachments/assets/02800e17-6f6b-4b12-a113-b0bad5ca2fef)
+
+![devicesModal](https://github.com/user-attachments/assets/2e18b845-4e30-4760-86f0-59101acb6cc3)
+
+<details>
+  <summary><h4>Landing page (Click to expand)</h4></summary>
+  <img src="https://github.com/user-attachments/assets/56f3167e-0584-4271-ab6e-354240627411"/>
+</details>
+
+
 ## Development usage
 
 Clone the repo:
