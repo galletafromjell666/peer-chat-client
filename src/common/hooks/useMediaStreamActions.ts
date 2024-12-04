@@ -92,7 +92,7 @@ function useMediaStreamActions() {
     kind: "audio" | "video",
     value: boolean
   ) => {
-    const peerConnection = peerConnectionRef.current;
+    const peerConnection = peerConnectionRef.current as RTCPeerConnection;
     const senders = peerConnection.getSenders();
 
     senders.forEach((sender) => {
@@ -107,7 +107,7 @@ function useMediaStreamActions() {
     kind: "audio" | "video",
     deviceId: string
   ) => {
-    const peerConnection = peerConnectionRef.current;
+    const peerConnection = peerConnectionRef.current as RTCPeerConnection;
     console.log(`Changing ${kind} track to use the ${deviceId}`);
 
     const constraints =

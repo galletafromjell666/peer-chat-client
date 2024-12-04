@@ -13,3 +13,16 @@ export const peerConnectionConfiguration = {
     },
   ],
 };
+
+export const getServerStatusMessages = (isSuccess: boolean) => {
+  if (isSuccess) {
+    return {
+      title: "PeerChat server is up and running.",
+      subTitle: " All systems are operational. Ready to connect securely.",
+    };
+  }
+  return {
+    title: "PeerChat server is currently unavailable.",
+    subTitle: "Please try again later or check your connection settings.",
+  };
+};

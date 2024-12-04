@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSocketIOConfigActions } from "@common/hooks/useSocketIOConfigActions";
-import { Button, Card, Flex, Input, theme, Typography } from "antd";
+import { getServerStatusMessages } from "@common/utils/constants";
+import useServerStatus from "@modules/landing/hooks/useServerStatus";
+import { Button, Card, Flex, Input, theme, Tooltip, Typography } from "antd";
 import { isEmpty } from "lodash";
 
 const { Text } = Typography;
 const { useToken } = theme;
 
 function CreateAndJoin() {
+  const { isSuccess, isLoading } = useServerStatus();
   const [joinConferenceId, setJoinConferenceId] = useState("");
   const socketIOActions = useSocketIOConfigActions();
   const navigate = useNavigate();
@@ -29,6 +32,11 @@ function CreateAndJoin() {
   const isConferenceIdValid =
     !isEmpty(joinConferenceId) && joinConferenceId.length > 1;
 
+  const tooltipTitle =
+    isLoading || !isSuccess
+      ? getServerStatusMessages(false).title
+      : undefined;
+
   return (
     <Flex
       justify="center"
@@ -49,20 +57,29 @@ function CreateAndJoin() {
               style={{ textAlign: "center" }}
               onChange={handleJoinInput}
             />
-            <Button
-              size="large"
-              disabled={!isConferenceIdValid}
-              onClick={handleJoin}
-            >
-              Join a chat room
-            </Button>
+            <Tooltip title={tooltipTitle}>
+              <Button
+                size="large"
+                disabled={!isConferenceIdValid || !isSuccess}
+                onClick={handleJoin}
+              >
+                Join a chat room
+              </Button>
+            </Tooltip>
           </Flex>
           <Text style={{ alignSelf: "center" }} strong>
             Or
           </Text>
-          <Button size="large" type="primary" onClick={handleCreate}>
-            Create a chat room
-          </Button>
+          <Tooltip title={tooltipTitle}>
+            <Button
+              disabled={!isSuccess || isLoading}
+              size="large"
+              type="primary"
+              onClick={handleCreate}
+            >
+              Create a chat room
+            </Button>
+          </Tooltip>
         </Flex>
       </Card>
     </Flex>
