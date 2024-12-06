@@ -24,7 +24,7 @@ PeerChat Client integrates with the [PeerChat Server](https://github.com/galleta
 ![devicesModal](https://github.com/user-attachments/assets/2e18b845-4e30-4760-86f0-59101acb6cc3)
 
 <details>
-  <summary><h4>Landing page (Click to expand)</h4></summary>
+  <summary><h5>Landing page (Click to expand)</h5></summary>
   <img src="https://github.com/user-attachments/assets/56f3167e-0584-4271-ab6e-354240627411"/>
 </details>
 
