@@ -5,7 +5,7 @@ import SocketIoClient, {
 } from "@common/utils/socketIOInstance";
 
 // Uses the socketIO instance from utils
-export function useSocketIo(configParams?: SocketIOClientConfig) {
+export function useSocketIO(configParams?: SocketIOClientConfig) {
   const navigate = useNavigate();
   const [config, setConfig] = useState(configParams);
   const [client, setClient] = useState<SocketIoClient>();
@@ -40,7 +40,7 @@ export function useSocketIo(configParams?: SocketIOClientConfig) {
     setClient(newClient);
 
     return () => {
-      console.log("useSocketIo clean up");
+      console.log("useSocketIO clean up");
       setClient(undefined)
       newClient.disconnect(); // Clean up connection on unmount
     };

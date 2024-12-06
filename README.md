@@ -2,14 +2,14 @@
 
 PeerChat Client is a feature-rich front-end application built for private and direct peer-to-peer communication. Developed with React, Socket.IO, Zustand, Ant Design (AntD), React Router, and SWR, it delivers a polished and efficient user experience.
 
-## Key Features:
+## Key Features
 
 - **Messaging & File Sharing:** Exchange messages and files directly with your peer, prioritizing privacy and speed.
 - **Video Chat:** Make video and audio calls with no intermediary servers, ensuring your data stays private.
 - **Customizable Media Settings:** Adjust your audio and video devices through an easy-to-use settings menu.
 - **Simple Room Management:** Quickly create or join chat rooms without requiring login or personal details.
 
-PeerChat Client integrates with the PeerChat Server, using Socket.IO for signaling and establishing peer-to-peer connections. Designed with user privacy and simplicity in mind, it ensures a reliable communication experience without storing data on servers.
+PeerChat Client integrates with the [PeerChat Server](https://github.com/galletafromjell666/peer-chat-signaling-server), using Socket.IO for signaling and establishing peer-to-peer connections. It ensures a reliable communication experience without storing data on servers.
 
 ## Media
 
@@ -28,6 +28,21 @@ PeerChat Client integrates with the PeerChat Server, using Socket.IO for signali
   <img src="https://github.com/user-attachments/assets/56f3167e-0584-4271-ab6e-354240627411"/>
 </details>
 
+## Technical Features
+
+Here’s a small list of features that caught my attention and were interesting to develop:
+
+- **Perfect Negotiation Pattern:** This pattern simplifies adding and removing tracks, as well as establishing connections between peers. It helps manage the connection lifecycle smoothly. [MDN DOCS](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation)
+
+- **File Transfer:** Sending files over WebRTC is not straightforward. On the sender’s side, files are sliced into smaller chunks to be sent through the WebRTC data channel. On the receiver’s side, the chunks are reassembled to reconstruct the file. It’s easier said than done haha.
+
+- **Handling Peer Disconnection:** When a peer disconnects, the remaining peer needs to create a new offer, generate ICE candidates, and re-establish the connection.
+
+- **Media Streams:** Adding a MediaStream to an already established RTCPeerConnection is straightforward, but dealing with media device constraints and updating the stream when a device changes is more complex. Often, renegotiation is required—but thankfully, the perfect negotiation pattern helps a lot! :)
+
+- **Integrating WebSockets with RTCPeerConnection:** Creating a context and custom hooks to integrate WebSockets with RTCPeerConnection made the codebase much more readable and maintainable.
+
+- **SSL Certificates:** Since getUserMedia is only available in secure contexts, I had to generate self-signed certificates to enable it for my local development environment.
 
 ## Development usage
 
@@ -58,8 +73,10 @@ pnpm dev
 Enable invalid certificates from localhost (required to access user media)
 
 ```bash
-chrome://flags/#allow-insecure-localhost
+chrome://flags/#
 ```
+
+If the flag `allow-insecure-localhost` is not available please check the flags `Temporarily unexpire MXXX flags`
 
 Open https://localhost:5174/
 
