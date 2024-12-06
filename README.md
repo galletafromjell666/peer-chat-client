@@ -1,6 +1,5 @@
 # peer-chat-client
-
-PeerChat Client is a feature-rich front-end application built for private and direct peer-to-peer communication. Developed with React, Socket.IO, Zustand, Ant Design (AntD), React Router, and SWR, it delivers a polished and efficient user experience.
+PeerChat Client is a front-end application designed to facilitate private and direct peer-to-peer communication. Built using React, Socket.IO, Zustand, Ant Design (AntD), React Router, and SWR, it offers a polished and efficient user experience. While the project began as a personal endeavor completed in my free time, I think it has evolved into a well-developed tool that can serve as a foundation for future projects or code reuse.
 
 ## Key Features
 
@@ -13,13 +12,27 @@ PeerChat Client integrates with the [PeerChat Server](https://github.com/galleta
 
 ## Media
 
+
+### Video demo
+https://github.com/user-attachments/assets/fa995bc2-d47e-47b0-b86d-cde130f2a3e0
+
+### Create and join a conference room
+
 ![createJoin](https://github.com/user-attachments/assets/6b207248-4752-49d8-a9cb-5521268101fe)
+
+### Conversation
 
 ![conversation](https://github.com/user-attachments/assets/f27472fb-47d8-4c58-b4fa-913af1f7e7b6)
 
+### Information Modal
+
 ![informationWindow](https://github.com/user-attachments/assets/2642db35-fd97-4c43-8f3f-3fdb437a59b8)
 
+### Video chat
+
 ![videochat](https://github.com/user-attachments/assets/02800e17-6f6b-4b12-a113-b0bad5ca2fef)
+
+### User Media Settings
 
 ![devicesModal](https://github.com/user-attachments/assets/2e18b845-4e30-4760-86f0-59101acb6cc3)
 
