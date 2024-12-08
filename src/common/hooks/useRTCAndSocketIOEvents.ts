@@ -14,7 +14,7 @@ import {
   PeerChatDataChannelMessage,
   PeerChatFileData,
 } from "@peer-chat-types/index";
-import { isNil } from "lodash";
+import isNil from "lodash/isNil";
 
 import { outgoingMediaStream, updateMediaStreams } from "./useMediaStreamStore";
 import { useRTCPeerConnectionContextValue } from "./useRTCConnectionContextValue";

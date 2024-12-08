@@ -4,7 +4,7 @@ import { useSocketIOConfigActions } from "@common/hooks/useSocketIOConfigActions
 import { getServerStatusMessages } from "@common/utils/constants";
 import useServerStatus from "@modules/landing/hooks/useServerStatus";
 import { Button, Card, Flex, Input, theme, Tooltip, Typography } from "antd";
-import { isEmpty } from "lodash";
+import isEmpty from "lodash/isEmpty";
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -33,9 +33,7 @@ function CreateAndJoin() {
     !isEmpty(joinConferenceId) && joinConferenceId.length > 1;
 
   const tooltipTitle =
-    isLoading || !isSuccess
-      ? getServerStatusMessages(false).title
-      : undefined;
+    isLoading || !isSuccess ? getServerStatusMessages(false).title : undefined;
 
   return (
     <Flex

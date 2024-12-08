@@ -4,7 +4,7 @@ import {
   PeerChatUser,
 } from "@peer-chat-types/index";
 import { AppState, Store } from "@peer-chat-types/store";
-import { pick } from "lodash";
+import pick from "lodash/pick";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 

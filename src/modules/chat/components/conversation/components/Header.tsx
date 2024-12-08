@@ -7,7 +7,7 @@ import { useIsPeerConnected } from "@common/store";
 import { mediaDevicesErrorAccessMessage } from "@common/utils/constants";
 import { Button, Flex, notification, Space, theme } from "antd";
 import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
-import { isNil } from "lodash";
+import isNil from "lodash/isNil";
 
 import InformationModal from "./InformationModal";
 

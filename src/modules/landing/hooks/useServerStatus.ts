@@ -1,4 +1,4 @@
-import { isEmpty } from "lodash";
+import isEmpty from "lodash/isEmpty";
 import useSWR from "swr";
 
 const getServerStatus = async (url: string) => {

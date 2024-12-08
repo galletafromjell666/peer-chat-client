@@ -3,7 +3,8 @@ import { downloadFileFromUrl } from "@common/utils/files";
 import { PeerChatFileData } from "@peer-chat-types/index";
 import { Button, Divider, Flex, Space, theme, Tooltip, Typography } from "antd";
 import { format, fromUnixTime } from "date-fns";
-import { isEmpty, isNil } from "lodash";
+import isEmpty from "lodash/isEmpty";
+import isNil from "lodash/isNil";
 
 const { Paragraph, Text } = Typography;
 const { useToken } = theme;

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { usePreferredAudioOutput } from "@common/store";
 import { Typography } from "antd";
-import { isEmpty } from "lodash";
+import isEmpty from "lodash/isEmpty";
 
 interface VideoPlayerProps {
   isBigFrame: boolean;

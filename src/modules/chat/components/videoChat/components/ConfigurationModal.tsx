@@ -7,7 +7,7 @@ import {
   useStoreActions,
 } from "@common/store";
 import { Flex, Modal, notification, Select, Typography } from "antd";
-import { isEmpty } from "lodash";
+import isEmpty from "lodash/isEmpty";
 
 const { Text } = Typography;
 const { useNotification } = notification;

@@ -10,7 +10,7 @@ import useMediaStreamActions from "@common/hooks/useMediaStreamActions";
 import { useOutgoingMediaStream } from "@common/hooks/useMediaStreamStore";
 import { mediaDevicesErrorAccessMessage } from "@common/utils/constants";
 import { Button, Flex, notification, Tooltip } from "antd";
-import { isNil } from "lodash";
+import isNil from "lodash/isNil";
 
 import ConfigurationModal from "./ConfigurationModal";
 
